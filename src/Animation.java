@@ -12,7 +12,7 @@ public class Animation {
         image = new Image[count];
 
         for(int i = 0; i < count; i++) {
-            image[i] = Toolkit.getDefaultToolkit().getImage(name + "_" + i + ".GIF");
+            image[i] = Toolkit.getDefaultToolkit().getImage(name + "_" + i + ".png");
         }
 
         this.duration = duration;
