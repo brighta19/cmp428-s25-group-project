@@ -1,4 +1,3 @@
-package main;
 import java.awt.*;
 
 public class Sprite extends Rect {
@@ -13,7 +12,7 @@ public class Sprite extends Rect {
 
     int pose = UP;
 
-    public Sprite(String name, int x, int y, int w, int h, String[] pose, int count, int duration)  {
+    public Sprite(String name, double x, double y, int w, int h, String[] pose, int count, int duration)  {
         super(x, y, w, h);
 
         animation = new Animation[pose.length];
@@ -23,9 +22,9 @@ public class Sprite extends Rect {
     }
 
     public void draw(Graphics pen) {
-        if(moving) pen.drawImage(animation[pose].nextImage(), x, y, w, h, null);
+        if(moving) pen.drawImage(animation[pose].nextImage(), (int)x, (int)y, w, h, null);
 
-        else       pen.drawImage(animation[pose].stillImage(), x, y, w, h, null);
+        else       pen.drawImage(animation[pose].stillImage(), (int)x, (int)y, w, h, null);
 
         moving = false;
     }
