@@ -31,9 +31,6 @@ public class PlatformerGame extends GameBase {
             player.ground();
         }
 
-
-        System.out.println(65);
-
         Rect[] bounds = TileMap.maps[TileMap.current].getBounds();
 
         for(int i = 0; i < bounds.length; i++) {

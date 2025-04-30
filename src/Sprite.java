@@ -12,13 +12,17 @@ public class Sprite extends Rect {
 
     int pose = UP;
 
-    public Sprite(String name, double x, double y, int w, int h, String[] pose, int count, int duration)  {
+    public Sprite(String name, double x, double y, int w, int h, String[] pose, int[] count, int duration)  {
         super(x, y, w, h);
 
         animation = new Animation[pose.length];
 
         for(int i = 0; i < pose.length; i++)
-            animation[i] = new Animation(name + "_" + pose[i], count, duration);
+            animation[i] = new Animation(name + "_" + pose[i], count[i], duration);
+    }
+
+    public Image getImage() {
+        return animation[pose].nextImage();
     }
 
     public void draw(Graphics pen) {
