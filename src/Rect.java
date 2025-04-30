@@ -1,17 +1,16 @@
-package main;
 import java.awt.Graphics;
 
 public class Rect {
-    int x;
-    int y;
+    double x;
+    double y;
 
     int w;
     int h;
 
-    int old_x;
-    int old_y;
+    double old_x;
+    double old_y;
 
-    public Rect(int x, int y, int w, int h) {
+    public Rect(double x, double y, int w, int h) {
         this.x = x;
         this.y = y;
 
@@ -19,7 +18,7 @@ public class Rect {
         this.h = h;
     }
 
-    public void moveBy(int dx, int dy) {
+    public void moveBy(double dx, double dy) {
         old_x = x;
         old_y = y;
 
@@ -27,31 +26,31 @@ public class Rect {
         y += dy;
     }
 
-    public void moveUp(int dy) {
+    public void moveUp(double dy) {
         old_y = y;
 
         y -= dy;
     }
 
-    public void moveDown(int dy) {
+    public void moveDown(double dy) {
         old_y = y;
 
         y += dy;
     }
 
-    public void moveLeft(int dx) {
+    public void moveLeft(double dx) {
         old_x = x;
 
         x -= dx;
     }
 
-    public void moveRight(int dx) {
+    public void moveRight(double dx) {
         old_x = x;
 
         x += dx;
     }
 
-    public void pushBy(int dx, int dy) {
+    public void pushBy(double dx, double dy) {
         x += dx;
         y += dy;
     }
@@ -63,11 +62,11 @@ public class Rect {
                (  x <= r.x + r.w);
     }
 
-    public boolean cameFromBelow() {
+    public boolean cameFromAbove() {
         return y > old_y;
     }
 
-    public boolean cameFromAbove() {
+    public boolean cameFromBelow() {
         return y < old_y;
     }
 
@@ -87,6 +86,6 @@ public class Rect {
     }
 
     public void draw(Graphics pen) {
-        pen.drawRect(x,  y,  w,  h);
+        pen.drawRect((int)x, (int)y, w, h);
     }
 }
