@@ -11,17 +11,21 @@ public class PlatformerGame extends GameBase {
     }
 
     public void inGameLoop() {
-        if (pressing[LT]) {
-            player.moveLeft();
-            Camera.moveLeft((int)Player.SPEED);
+        if (player.canMove()) {
+            if (pressing[LT] || pressing[_A]) {
+                player.moveLeft();
+                Camera.moveLeft((int) Player.SPEED);
+            }
+            if (pressing[RT] || pressing[_D]) {
+                player.moveRight();
+                Camera.moveRight((int) Player.SPEED);
+            }
         }
-        if (pressing[RT]) {
-            player.moveRight();
-            Camera.moveRight((int)Player.SPEED);
-        }
-
-        if (pressing[UP] && !player.jumping) {
+        if (player.canJump() && (pressing[UP] || pressing[_W])) {
             player.jump();
+        }
+        if (player.canAttack() && pressing[_U]) {
+            player.attack();
         }
 
         player.updatePosition();
