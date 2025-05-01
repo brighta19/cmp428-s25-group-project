@@ -55,7 +55,7 @@ public class TileMap extends RoomBase
 	
 		try
 		{
-		   BufferedReader input = new BufferedReader(new FileReader(file));
+			BufferedReader input = new BufferedReader(new FileReader(file));
 			   
 		   // Load Map Codes
 		   int n = Integer.parseInt(input.readLine());  
@@ -112,7 +112,7 @@ public class TileMap extends RoomBase
 		   input.close();
 		}
 		catch(IOException x) {};	
-}
+	}
 	
 	//------------------------------------------------------------------------//
    // Load Images for Tiles and Background as indicated TileMap data files   // 
@@ -133,25 +133,25 @@ public class TileMap extends RoomBase
 	   // Convenience method for loading images                                  //
 		//------------------------------------------------------------------------//
 		
-		public Image getImage(String filename)
+	public Image getImage(String filename)
+	{
+		return Toolkit.getDefaultToolkit().getImage(filename);
+	
+	
+	public Rect[] getBounds() {
+		return bounds;
+	}
+		
+	public void changeMap(int room) {
+		if( room >= 0 && room < maps.length ) 
 		{
-			return Toolkit.getDefaultToolkit().getImage(filename);
+			System.out.println("room changed");
+			current = room;
 		}
+	}
 		
-		public Rect[] getBounds() {
-			return bounds;
-		}
-		
-		public void changeMap(int room) {
-			if( room >= 0 && room < maps.length ) 
-			{
-				System.out.println("room changed");
-				current = room;
-			}
-		}
-		
-		public int getLeftLimit() { return lx_limit; }
-		public int getRightLimit() { return rx_limit; }
+	public int getLeftLimit() { return lx_limit; }
+	public int getRightLimit() { return rx_limit; }
 	
 	
 	//------------------------------------------------------------------------//
