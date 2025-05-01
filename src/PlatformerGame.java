@@ -66,7 +66,7 @@ public class PlatformerGame extends GameBase {
 
     public void paint(Graphics pen) {
         player.draw(pen);
-        TileMap.maps[TileMap.current].draw(pen);
+        //TileMap.maps[TileMap.current].draw(pen);
         Rect[] bounds = TileMap.maps[TileMap.current].getBounds();
         for (Rect bound : bounds) {
             pen.drawRect((int)bound.x, (int)bound.y, bound.w, bound.h);
