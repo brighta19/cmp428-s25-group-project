@@ -23,7 +23,7 @@ public class TileMap extends RoomBase
 
 	int scale;
 	
-	//the maps left and right x's 
+	//the maps left and right x's where the camera cant go any further
 	int lx_limit;
 	int rx_limit;
 	
