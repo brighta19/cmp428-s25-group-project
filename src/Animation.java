@@ -20,6 +20,11 @@ public class Animation {
         delay = duration;
     }
 
+    public void reset() {
+        current = 0;
+        delay = 0;
+    }
+
     public Image nextImage() {
         if(delay == 0) {
             current++;

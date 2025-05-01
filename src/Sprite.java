@@ -21,6 +21,15 @@ public class Sprite extends Rect {
             animation[i] = new Animation(name + "_" + pose[i], count[i], duration);
     }
 
+    public void setPose(int p, boolean restartAnimation) {
+        if (pose != p) {
+            pose = p;
+
+            if (restartAnimation)
+                animation[pose].reset();
+        }
+    }
+
     public Image getImage() {
         return animation[pose].nextImage();
     }
