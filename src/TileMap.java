@@ -3,13 +3,10 @@ import java.io.*;
 
 public class TileMap extends RoomBase
 {
-
 	//tracks which map player is in and the map
 	static int current = 0;
 	static int numMaps = 0;
-	static TileMap[] maps = new TileMap[1];
-	
-	static Player player = new Player(50, 50);
+	static TileMap[] maps = new TileMap[2];
 	
 	//for periods and characters you seen in the file
 	String[] map;
@@ -26,29 +23,34 @@ public class TileMap extends RoomBase
 
 	int scale;
 	
+	//the maps left and right x's 
+	int lx_limit;
+	int rx_limit;
+	
+	
+		
 	//------------------------------------------------------------------------//
 	
-	public TileMap(String fileName,int scale)
+	public TileMap(String filename,int scale)
 	{
 		super(pressing);
 		this.scale = scale;
-		loadMap(fileName);
+		loadMaps(filename);
 		loadAssets();
 		maps[numMaps] = this;
 		numMaps++;
 	}
 	
 	@Override
-	public void inGameLoop() {
-
-	}
+	public void inGameLoop() {}
 	
 	//------------------------------------------------------------------------//
    // Load TileMap data from a text file                                     //
 	//------------------------------------------------------------------------//
 	
-	public void loadMap(String fileName)
+	public void loadMaps(String fileName)
 	{
+		
 		File file = new File(fileName);
 	
 		try
@@ -65,7 +67,7 @@ public class TileMap extends RoomBase
 			   map[row] = input.readLine();
 		   }
 		   
-		   // Load Tile Fileames
+		   // Load Tile Filenames
 		   n = Integer.parseInt(input.readLine());
 		   
 		   tile_name = new String[n];
@@ -100,7 +102,13 @@ public class TileMap extends RoomBase
 			   //to skip the gap, makes the text file more readable
 			   input.readLine();
 		   }
-		   		   
+		   
+		   
+		   //the points in which player and camera can't go further
+		   lx_limit = (Integer.parseInt(input.readLine())) * scale;
+		   rx_limit = (Integer.parseInt(input.readLine())) * scale;
+		   
+	
 		   input.close();
 		}
 		catch(IOException x) {};	
@@ -121,6 +129,30 @@ public class TileMap extends RoomBase
 		background = getImage(background_name);		
 	}
 	
+		//------------------------------------------------------------------------//
+	   // Convenience method for loading images                                  //
+		//------------------------------------------------------------------------//
+		
+		public Image getImage(String filename)
+		{
+			return Toolkit.getDefaultToolkit().getImage(filename);
+		}
+		
+		public Rect[] getBounds() {
+			return bounds;
+		}
+		
+		public void changeMap(int room) {
+			if( room >= 0 && room < maps.length ) 
+			{
+				System.out.println("room changed");
+				current = room;
+			}
+		}
+		
+		public int getLeftLimit() { return lx_limit; }
+		public int getRightLimit() { return rx_limit; }
+	
 	
 	//------------------------------------------------------------------------//
    // Draw the TileMap                                                       //
@@ -132,7 +164,7 @@ public class TileMap extends RoomBase
 			pen.drawImage(background,  (i * 1920) +  (- Camera.x / 5) ,  - Camera.y / 5, 1920, 1080, null);
 		}
 		
-		for(int row = 0; row < maps[current].map.length; row++)
+		for(int row = 0; row < map.length; row++)
 		{	
 			for(int col = 0; col < map[row].length(); col++)
 			{
@@ -143,24 +175,11 @@ public class TileMap extends RoomBase
 					//to check if the bounds are correct
 					for(Rect rect: bounds) { rect.draw(pen); }
 					
-					pen.drawImage(maps[current].tile[c - 'A'], scale*col - Camera.x, scale*row - Camera.y, scale, scale, null);
+					pen.drawImage(tile[c - 'A'], scale*col - Camera.x, scale*row - Camera.y, scale, scale, null);
 				}
 			}
 		}
 		
-	}
-	
-	//------------------------------------------------------------------------//
-   // Convenience method for loading images                                  //
-	//------------------------------------------------------------------------//
-	
-	public Image getImage(String filename)
-	{
-		return Toolkit.getDefaultToolkit().getImage(filename);
-	}
-	
-	public Rect[] getBounds() {
-		return maps[current].bounds;
 	}
 
 }
