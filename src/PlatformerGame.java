@@ -50,26 +50,16 @@ public class PlatformerGame extends GameBase {
                 }
             }
         }
-        //to enter map to the left
-        if( player.x < (TileMap.maps[TileMap.current].getLeftLimit()) && (TileMap.current != 0)) {
-        	map.changeMap(TileMap.current - 1);
-        	player.x = TileMap.maps[TileMap.current].getRightLimit();
-        	Camera.x = TileMap.maps[TileMap.current].getRightLimit() - 1920;
-        }
-        //to enter the room to the right
-        if( player.x > (TileMap.maps[TileMap.current].getRightLimit()) && (TileMap.current != 1)) {
-        	map.changeMap(TileMap.current + 1);
-        	player.x = TileMap.maps[TileMap.current].getLeftLimit();
-        	Camera.x = TileMap.maps[TileMap.current].getLeftLimit();
-        }
+        map.checkIfNearEdge(player);
     }
 
     public void paint(Graphics pen) {
+        TileMap.maps[TileMap.current].draw(pen);
         player.draw(pen);
         //TileMap.maps[TileMap.current].draw(pen);
-        Rect[] bounds = TileMap.maps[TileMap.current].getBounds();
-        for (Rect bound : bounds) {
-            pen.drawRect((int)bound.x, (int)bound.y, bound.w, bound.h);
-        }
+        //Rect[] bounds = TileMap.maps[TileMap.current].getBounds();
+        //for (Rect bound : bounds) {
+            //pen.drawRect((int)bound.x, (int)bound.y, bound.w, bound.h);
+        //}
     }
 }
