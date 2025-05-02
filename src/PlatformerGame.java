@@ -13,6 +13,8 @@ public class PlatformerGame extends GameBase {
     }
 
     public void inGameLoop() {
+        player.beforeInput();
+
         if (player.canMove()) {
             if (pressing[LT] || pressing[_A]) {
                 player.moveLeft();
@@ -54,6 +56,8 @@ public class PlatformerGame extends GameBase {
     public void paint(Graphics pen) {
         TileMap.maps[TileMap.current].draw(pen);
         player.draw(pen);
+//        player.drawBoxes(pen);
+
         //TileMap.maps[TileMap.current].draw(pen);
         //Rect[] bounds = TileMap.maps[TileMap.current].getBounds();
         //for (Rect bound : bounds) {

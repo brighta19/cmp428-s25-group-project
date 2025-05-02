@@ -14,7 +14,6 @@ public class Player extends Sprite {
     };
     static int[] count = {8, 8, 11, 6, 5, 7, 5, 8, 2, 6};
 
-
     public static final double SPEED = 8;
     static final double JUMP = 22;
 
@@ -45,38 +44,6 @@ public class Player extends Sprite {
         y += vy;
     }
 
-    public void updatePose() {
-        if (attacking) {
-            if (jumping) {
-                if (attackType == 2) {
-                    setPose(Pose.JUMP_ATTACK_2.ordinal(), true);
-                } else {
-                    setPose(Pose.JUMP_ATTACK_1.ordinal(), true);
-                }
-            }
-            else {
-                switch (attackType) {
-                    case 2:
-                        setPose(Pose.ATTACK_2.ordinal(), true);
-                        break;
-                    case 3:
-                        setPose(Pose.ATTACK_3.ordinal(), true);
-                        break;
-                    default:
-                        setPose(Pose.ATTACK_1.ordinal(), true);
-                        break;
-                }
-            }
-        }
-        else if (jumping) {
-            setPose(Pose.JUMP.ordinal(), true);
-        }
-        else if (vx != 0)
-            pose = Pose.RUN.ordinal();
-        else
-            pose = Pose.IDLE.ordinal();
-    }
-
     public void moveLeft() {
         vx = -SPEED;
         direction = -1;
@@ -98,17 +65,9 @@ public class Player extends Sprite {
     }
 
     public void attack() {
-        int p;
         if (canCombo) {
             if (attackType == 1) {
                 attackType = 2;
-
-                if (jumping) {
-                    p = Pose.JUMP_ATTACK_2.ordinal();
-                }
-                else {
-                    p = Pose.ATTACK_2.ordinal();
-                }
             }
             else if (attackType == 2) {
                 if (jumping) {
@@ -117,7 +76,6 @@ public class Player extends Sprite {
                 }
                 else {
                     attackType = 3;
-                    p = Pose.ATTACK_3.ordinal();
                 }
             }
             else {
@@ -127,16 +85,29 @@ public class Player extends Sprite {
         }
         else {
             attackType = 1;
-
-            if (jumping) {
-                p = Pose.JUMP_ATTACK_1.ordinal();
-            }
-            else {
-                p = Pose.ATTACK_1.ordinal();
-            }
         }
 
         attacking = true;
+        calculateAttackDelay();
+    }
+
+    public void calculateAttackDelay() {
+        int p;
+        if (jumping) {
+            if (attackType == 1)
+                p = Pose.JUMP_ATTACK_1.ordinal();
+            else
+                p = Pose.JUMP_ATTACK_1.ordinal();
+        }
+        else {
+            if (attackType == 1)
+                p = Pose.ATTACK_1.ordinal();
+            else if (attackType == 2)
+                p = Pose.ATTACK_2.ordinal();
+            else
+                p = Pose.ATTACK_3.ordinal();
+        }
+
         attackDelay = ANIMATION_DURATION * count[p];
     }
 
@@ -156,22 +127,8 @@ public class Player extends Sprite {
         this.ay = ay;
     }
 
-    public void draw(Graphics pen) {
-        updatePose();
-
-        int offset_x = direction < 0 ? 200 : -140;
-        pen.drawImage(
-                getImage(),
-                (int)(x + offset_x) - Camera.x,
-                (int)(y - 84) - Camera.y,
-                direction * SPRITE_WIDTH * 4,
-                SPRITE_HEIGHT * 4,
-                null);
-
-        // draw the box of the body
-        pen.drawRect((int)x - Camera.x, (int)y - Camera.y, w, h);
-
-        // stop moving when LT/RT isn't pressed
+    public void beforeInput() {
+        // stop moving in case LT/RT isn't pressed
         vx = 0;
 
         if (attacking) {
@@ -188,5 +145,55 @@ public class Player extends Sprite {
         else {
             canCombo = false;
         }
+    }
+
+    private void updatePose() {
+        if (attacking) {
+            if (jumping) {
+                if (attackType == 2) {
+                    setPose(Pose.JUMP_ATTACK_2.ordinal(), true);
+                } else {
+                    setPose(Pose.JUMP_ATTACK_1.ordinal(), true);
+                }
+            }
+            else {
+                switch (attackType) {
+                    case 2:
+                        setPose(Pose.ATTACK_2.ordinal(), true);
+                        break;
+                    case 3:
+                        setPose(Pose.ATTACK_3.ordinal(), true);
+                        break;
+                    default:
+                        setPose(Pose.ATTACK_1.ordinal(), true);
+                }
+            }
+        }
+        else if (jumping) {
+            setPose(Pose.JUMP.ordinal(), true);
+        }
+        else if (vx != 0)
+            setPose(Pose.RUN.ordinal(), true);
+        else
+            setPose(Pose.IDLE.ordinal(), true);
+    }
+
+    public void draw(Graphics pen) {
+        updatePose();
+
+        int offset_x = direction < 0 ? 200 : -140;
+        pen.drawImage(
+                getImage(),
+                (int)(x + offset_x) - Camera.x,
+                (int)(y - 84) - Camera.y,
+                direction * SPRITE_WIDTH * 4,
+                SPRITE_HEIGHT * 4,
+                null);
+    }
+
+    public void drawBoxes(Graphics pen) {
+        // draw the box of the body
+        pen.setColor(new Color(0, 0, 255, 50));
+        pen.fillRect((int)x, (int)y, w, h);
     }
 }
