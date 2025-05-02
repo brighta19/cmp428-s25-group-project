@@ -16,7 +16,7 @@ public class Player extends Sprite {
     static String[] poses = {
             "idle", "run", "jump", "jump-attack1", "jump-attack2", "attack1", "attack2", "attack3", "hurt", "death"
     };
-    static int[] count = {8, 8, 11, 6, 5, 7, 5, 8, 2, 6};
+    static int[] count = {8, 8, 9, 6, 5, 7, 5, 8, 2, 6};
 
     public static final double SPEED = 8;
     static final double JUMP = 22;
@@ -29,6 +29,7 @@ public class Player extends Sprite {
 
     boolean jumping = false;
     boolean attacking = false;
+    boolean dying = false;
 
     int attackDelay = 0;
     int attackType = 1;
@@ -119,15 +120,15 @@ public class Player extends Sprite {
     }
 
     public boolean canMove() {
-        return !attacking || jumping;
+        return !dying && (!attacking || jumping);
     }
 
     public boolean canJump() {
-        return !jumping;
+        return !dying && !jumping;
     }
 
     public boolean canAttack() {
-        return !attacking;
+        return !dying && !attacking;
     }
 
     public void setAcceleration(double ay) {
@@ -154,6 +155,10 @@ public class Player extends Sprite {
         targetsAlreadyHit.add(target);
     }
 
+    public void die() {
+        dying = true;
+    }
+
     public void beforeInput() {
         // stop moving in case LT/RT isn't pressed
         vx = 0;
@@ -175,34 +180,46 @@ public class Player extends Sprite {
     }
 
     private void updatePose() {
-        if (attacking) {
+        Pose p;
+        boolean repeats = false;
+
+        if (dying) {
+            p = Pose.DEATH;
+        }
+        else if (attacking) {
             if (jumping) {
                 if (attackType == 2) {
-                    setPose(Pose.JUMP_ATTACK_2.ordinal(), true);
+                    p = Pose.JUMP_ATTACK_2;
                 } else {
-                    setPose(Pose.JUMP_ATTACK_1.ordinal(), true);
+                    p = Pose.JUMP_ATTACK_1;
                 }
             }
             else {
                 switch (attackType) {
                     case 2:
-                        setPose(Pose.ATTACK_2.ordinal(), true);
+                        p = Pose.ATTACK_2;
                         break;
                     case 3:
-                        setPose(Pose.ATTACK_3.ordinal(), true);
+                        p = Pose.ATTACK_3;
                         break;
                     default:
-                        setPose(Pose.ATTACK_1.ordinal(), true);
+                        p = Pose.ATTACK_1;
                 }
             }
         }
         else if (jumping) {
-            setPose(Pose.JUMP.ordinal(), true);
+            p = Pose.JUMP;
         }
-        else if (vx != 0)
-            setPose(Pose.RUN.ordinal(), true);
-        else
-            setPose(Pose.IDLE.ordinal(), true);
+        else if (vx != 0) {
+            p = Pose.RUN;
+            repeats = true;
+        }
+        else {
+            p = Pose.IDLE;
+            repeats = true;
+        }
+
+        setPose(p.ordinal(), true, repeats);
     }
 
     public void draw(Graphics pen) {
