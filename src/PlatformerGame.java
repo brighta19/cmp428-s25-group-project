@@ -3,7 +3,7 @@ import java.awt.*;
 public class PlatformerGame extends GameBase {
     final double GRAVITY = 1.1;
 
-    Player player = new Player(200, 200);
+    static Player player = new Player(200, 200);
     TileMap map;
 
     public void initialize() {

@@ -136,7 +136,7 @@ public class TileMap extends RoomBase
 	public Image getImage(String filename) {
 		return Toolkit.getDefaultToolkit().getImage(filename);
 	}
-	
+
 	
 	public Rect[] getBounds() {
 		return bounds;
@@ -163,11 +163,11 @@ public class TileMap extends RoomBase
 	        	player.x = maps[current].getLeftLimit();
 	        	Camera.x = maps[current].getLeftLimit();
 		 }
-	}	
-		
+	}
+
 	public int getLeftLimit() { return lx_limit; }
 	public int getRightLimit() { return rx_limit; }
-	
+
 	//------------------------------------------------------------------------//
    // Draw the TileMap                                                       //
 	//------------------------------------------------------------------------//
