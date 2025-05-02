@@ -31,10 +31,12 @@ public class PlatformerGame extends GameBase {
         if (player.canAttack() && pressing[_U]) {
             player.attack();
         }
+//        if (pressing[_O]) player.die();
+//        if (pressing[_P]) player.dying = false;
 
         player.updatePosition();
 
-//         if (player.hits(enemy)) { player.registerHit((enemy); ... }
+//         if (player.hits(enemy)) { player.registerHit(enemy); ... }
 
         if (player.y + player.h > 1000) {
             player.y = 1000 - player.h;

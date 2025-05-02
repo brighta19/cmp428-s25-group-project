@@ -8,6 +8,9 @@ public class Animation {
     int duration;
     int delay;
 
+    boolean repeats = true;
+    boolean done = false;
+
     public Animation(String name, int count, int duration) {
         image = new Image[count];
 
@@ -16,20 +19,35 @@ public class Animation {
         }
 
         this.duration = duration;
-
         delay = duration;
     }
 
     public void reset() {
         current = 0;
         delay = 0;
+        done = false;
+    }
+
+    public void reset(boolean repeats) {
+        reset();
+        this.repeats = repeats;
     }
 
     public Image nextImage() {
+        if (done) return image[current];
+
         if(delay == 0) {
             current++;
 
-            if(current >= image.length)  current = 1;
+            if(current >= image.length) {
+                if (repeats) {
+                    current = 0;
+                }
+                else {
+                    current = image.length - 1;
+                    done = true;
+                }
+            }
 
             delay = duration;
         }
