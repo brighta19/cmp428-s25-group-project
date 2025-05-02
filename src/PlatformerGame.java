@@ -34,6 +34,8 @@ public class PlatformerGame extends GameBase {
 
         player.updatePosition();
 
+//         if (player.hits(enemy)) { player.registerHit((enemy); ... }
+
         if (player.y + player.h > 1000) {
             player.y = 1000 - player.h;
             player.ground();

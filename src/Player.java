@@ -1,8 +1,12 @@
 import java.awt.*;
+import java.util.ArrayList;
 
 public class Player extends Sprite {
     static int SPRITE_WIDTH = 80;
     static int SPRITE_HEIGHT = 64;
+
+    static int HITBOX_WIDTH = 75;
+    static int HITBOX_HEIGHT = 108;
 
     static int ANIMATION_DURATION = 3;
     enum Pose {
@@ -29,6 +33,8 @@ public class Player extends Sprite {
     int attackDelay = 0;
     int attackType = 1;
     boolean canCombo = false;
+
+    ArrayList<Rect> targetsAlreadyHit = new ArrayList<>();
 
     public Player(double x, double y) {
         super("warrior", x, y, 60, 108, poses, count, ANIMATION_DURATION);
@@ -88,6 +94,7 @@ public class Player extends Sprite {
         }
 
         attacking = true;
+        targetsAlreadyHit.clear();
         calculateAttackDelay();
     }
 
@@ -125,6 +132,26 @@ public class Player extends Sprite {
 
     public void setAcceleration(double ay) {
         this.ay = ay;
+    }
+
+    private Rect getHitbox() {
+        return new Rect(
+                x + (direction < 0 ? -HITBOX_WIDTH : w),
+                y,
+                HITBOX_WIDTH,
+                HITBOX_HEIGHT);
+    }
+
+    public boolean hits(Rect target) {
+        if (!attacking) return false;
+        if (targetsAlreadyHit.contains(target)) return false;
+
+        Rect hitbox = getHitbox();
+        return hitbox.overlaps(target);
+    }
+
+    public void registerHit(Rect target) {
+        targetsAlreadyHit.add(target);
     }
 
     public void beforeInput() {
@@ -195,5 +222,12 @@ public class Player extends Sprite {
         // draw the box of the body
         pen.setColor(new Color(0, 0, 255, 50));
         pen.fillRect((int)x, (int)y, w, h);
+
+        // draw the hitbox
+        if (attacking) {
+            pen.setColor(new Color(255, 0, 0, 50));
+            Rect hitbox = getHitbox();
+            pen.fillRect((int)hitbox.x, (int)hitbox.y, hitbox.w, hitbox.h);
+        }
     }
 }
