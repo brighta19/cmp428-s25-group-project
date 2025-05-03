@@ -5,7 +5,7 @@ public class Camera
 	
 	static int x = 0;
 	static int y = 0;
-	
+
 	//------------------------------------------------------------------------//
 	
 	public static void setLocation(int x, int y)
@@ -49,5 +49,10 @@ public class Camera
 	}
 	
 	//------------------------------------------------------------------------//
-	
+
+	public static void moveBy(int dx, int dy)
+	{
+		x += dx;
+		y += dy;
+	}
 }
