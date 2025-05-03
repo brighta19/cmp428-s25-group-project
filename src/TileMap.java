@@ -133,9 +133,9 @@ public class TileMap extends RoomBase
 	   // Convenience method for loading images                                  //
 		//------------------------------------------------------------------------//
 		
-	public Image getImage(String filename)
-	{
+	public Image getImage(String filename) {
 		return Toolkit.getDefaultToolkit().getImage(filename);
+	}
 	
 	
 	public Rect[] getBounds() {
@@ -154,14 +154,14 @@ public class TileMap extends RoomBase
 	//if so transitions automatically
 	public void checkIfNearEdge(Player player) {
 		 if( player.x < (maps[current].getLeftLimit() - 10) && (current != 0)) {
-	        	changeCurrent(current - 1);
+//	        	changeCurrent(current - 1);
 	        	player.x = maps[current].getRightLimit() - 20;
 	        	Camera.x = maps[current].getRightLimit() - 1920;
 	     }
 		 if( player.x > (maps[current].getRightLimit() - 10) && (current != 1)) {
-	        	changeCurrent(current + 1);
+//	        	changeCurrent(current + 1);
 	        	player.x = maps[current].getLeftLimit();
-	        	Camera.x = (maps[current].getLeftLimit();
+	        	Camera.x = maps[current].getLeftLimit();
 		 }
 	}	
 		

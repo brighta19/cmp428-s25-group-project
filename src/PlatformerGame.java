@@ -45,8 +45,6 @@ public class PlatformerGame extends GameBase {
                     double dy = (player.y + player.h) - bounds[i].y;
                     player.pushBy(0, -dy);
                     player.ground();
-
-                    Camera.moveDown(10);
                 }
             }
         }

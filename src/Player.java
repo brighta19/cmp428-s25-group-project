@@ -162,14 +162,14 @@ public class Player extends Sprite {
         int offset_x = direction < 0 ? 200 : -140;
         pen.drawImage(
                 getImage(),
-                (int)x + offset_x,
-                (int)y - 84,
+                (int)(x + offset_x) - Camera.x,
+                (int)(y - 84) - Camera.y,
                 direction * SPRITE_WIDTH * 4,
                 SPRITE_HEIGHT * 4,
                 null);
 
         // draw the box of the body
-        pen.drawRect((int)x, (int)y, w, h);
+        pen.drawRect((int)x - Camera.x, (int)y - Camera.y, w, h);
 
         // stop moving when LT/RT isn't pressed
         vx = 0;
