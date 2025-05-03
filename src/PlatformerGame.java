@@ -3,7 +3,8 @@ import java.awt.*;
 public class PlatformerGame extends GameBase {
     final double GRAVITY = 1.1;
 
-    static Player player = new Player(200, 200);
+    static Player player = new Player(500, 200);
+
     TileMap map;
 
     public void initialize() {
@@ -18,11 +19,9 @@ public class PlatformerGame extends GameBase {
         if (player.canMove()) {
             if (pressing[LT] || pressing[_A]) {
                 player.moveLeft();
-                Camera.moveLeft((int) Player.SPEED);
             }
             if (pressing[RT] || pressing[_D]) {
                 player.moveRight();
-                Camera.moveRight((int) Player.SPEED);
             }
         }
         if (player.canJump() && (pressing[UP] || pressing[_W])) {
@@ -31,12 +30,14 @@ public class PlatformerGame extends GameBase {
         if (player.canAttack() && pressing[_U]) {
             player.attack();
         }
+//        if (pressing[_I]) player.injureBy(new Rect(0,0,0,0), 1);
 //        if (pressing[_O]) player.die();
-//        if (pressing[_P]) player.dying = false;
+//        if (pressing[_P]) player.revive();
 
         player.updatePosition();
 
-//         if (player.hits(enemy)) { player.registerHit(enemy); ... }
+//        if (player.hits(enemy)) { player.registerHit(enemy); ... }
+//        if (enemy hits player) { player.injureBy(enemy, 1); ... }
 
         if (player.y + player.h > 1000) {
             player.y = 1000 - player.h;
@@ -58,6 +59,8 @@ public class PlatformerGame extends GameBase {
     }
 
     public void paint(Graphics pen) {
+        Camera.moveBy((int)(player.x - player.old_x), 0);
+
         TileMap.maps[TileMap.current].draw(pen);
         player.draw(pen);
 //        player.drawBoxes(pen);
@@ -65,7 +68,7 @@ public class PlatformerGame extends GameBase {
         //TileMap.maps[TileMap.current].draw(pen);
         //Rect[] bounds = TileMap.maps[TileMap.current].getBounds();
         //for (Rect bound : bounds) {
-            //pen.drawRect((int)bound.x, (int)bound.y, bound.w, bound.h);
+        //pen.drawRect((int)bound.x, (int)bound.y, bound.w, bound.h);
         //}
     }
 }

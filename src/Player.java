@@ -2,11 +2,21 @@ import java.awt.*;
 import java.util.ArrayList;
 
 public class Player extends Sprite {
+    public static final double SPEED = 8;
+    static final double JUMP = 22;
+
+    static int INITIAL_HEALTH = 15;
+    static int HURT_DURATION = 20;
+
+    static int KNOCKBACK_X = 5;
+    static int KNOCKBACK_Y = 10;
+
+    static int HITBOX_WIDTH = 80;
+    static int HITBOX_NORMAL_HEIGHT = 108;
+    static int HITBOX_JUMP_HEIGHT = 80;
+
     static int SPRITE_WIDTH = 80;
     static int SPRITE_HEIGHT = 64;
-
-    static int HITBOX_WIDTH = 75;
-    static int HITBOX_HEIGHT = 108;
 
     static int ANIMATION_DURATION = 3;
     enum Pose {
@@ -18,9 +28,6 @@ public class Player extends Sprite {
     };
     static int[] count = {8, 8, 9, 6, 5, 7, 5, 8, 2, 6};
 
-    public static final double SPEED = 8;
-    static final double JUMP = 22;
-
     double vx = 0;
     double vy = 0;
 
@@ -29,13 +36,16 @@ public class Player extends Sprite {
 
     boolean jumping = false;
     boolean attacking = false;
+    boolean hurting = false;
     boolean dying = false;
 
     int attackDelay = 0;
     int attackType = 1;
     boolean canCombo = false;
-
     ArrayList<Rect> targetsAlreadyHit = new ArrayList<>();
+
+    int health = INITIAL_HEALTH;
+    int hurtDelay = 0;
 
     public Player(double x, double y) {
         super("warrior", x, y, 60, 108, poses, count, ANIMATION_DURATION);
@@ -43,9 +53,6 @@ public class Player extends Sprite {
 
     public void updatePosition() {
         vy += ay;
-
-        old_x = x;
-        old_y = y;
 
         x += vx;
         y += vy;
@@ -64,10 +71,16 @@ public class Player extends Sprite {
     public void jump() {
         vy = -JUMP;
         jumping = true;
+
+        // reset attack
+        if (attacking) {
+            canCombo = false;
+            attack();
+        }
     }
 
     public void ground() {
-        vy = 0;
+        if (vy > 0) vy = 0;
         jumping = false;
     }
 
@@ -97,6 +110,11 @@ public class Player extends Sprite {
         attacking = true;
         targetsAlreadyHit.clear();
         calculateAttackDelay();
+
+//        if (vx != 0 && !jumping) {
+//            // moves forward according to the length of the attack animation (nice for combos)
+//            x += direction * (SPEED * attackDelay/ANIMATION_DURATION);
+//        }
     }
 
     public void calculateAttackDelay() {
@@ -120,15 +138,15 @@ public class Player extends Sprite {
     }
 
     public boolean canMove() {
-        return !dying && (!attacking || jumping);
+        return !dying && !hurting && (!attacking || jumping);
     }
 
     public boolean canJump() {
-        return !dying && !jumping;
+        return !dying && !hurting && !jumping;
     }
 
     public boolean canAttack() {
-        return !dying && !attacking;
+        return !dying && !hurting && !attacking;
     }
 
     public void setAcceleration(double ay) {
@@ -136,11 +154,13 @@ public class Player extends Sprite {
     }
 
     private Rect getHitbox() {
+        double hitbox_x = x + (direction < 0 ? -HITBOX_WIDTH : w);
+        int hitbox_h = jumping ? HITBOX_JUMP_HEIGHT : HITBOX_NORMAL_HEIGHT;
         return new Rect(
-                x + (direction < 0 ? -HITBOX_WIDTH : w),
+                hitbox_x,
                 y,
                 HITBOX_WIDTH,
-                HITBOX_HEIGHT);
+                hitbox_h);
     }
 
     public boolean hits(Rect target) {
@@ -155,13 +175,61 @@ public class Player extends Sprite {
         targetsAlreadyHit.add(target);
     }
 
+    public void injureBy(Rect attacker, int damage) {
+        hurt(damage);
+
+        double player_center_x = x + w/2.0;
+        double attacker_center_x = attacker.x + attacker.w/2.0;
+        int direction = player_center_x < attacker_center_x ? -1 : 1;
+        knockBack(direction);
+
+        if (health == 0) {
+            die();
+        }
+    }
+
+    private void hurt(int damage) {
+        health -= damage;
+        if (health < 0) health = 0;
+
+        if (!dying) {
+            hurting = true;
+            hurtDelay = HURT_DURATION;
+        }
+    }
+
+    private void knockBack(int direction) {
+        if (!dying) {
+            vx = direction * KNOCKBACK_X;
+            this.direction = -direction;
+        }
+
+        vy = -KNOCKBACK_Y;
+    }
+
     public void die() {
         dying = true;
     }
 
+    public void revive() {
+        dying = false;
+        health = INITIAL_HEALTH;
+    }
+
     public void beforeInput() {
         // stop moving in case LT/RT isn't pressed
-        vx = 0;
+        if (!hurting) {
+            vx = 0;
+        }
+
+        if (hurting) {
+            if (hurtDelay == 0) {
+                hurting = false;
+            }
+            else {
+                hurtDelay--;
+            }
+        }
 
         if (attacking) {
             if (attackDelay == 0) {
@@ -177,6 +245,9 @@ public class Player extends Sprite {
         else {
             canCombo = false;
         }
+
+        old_x = x;
+        old_y = y;
     }
 
     private void updatePose() {
@@ -185,6 +256,10 @@ public class Player extends Sprite {
 
         if (dying) {
             p = Pose.DEATH;
+        }
+        else if (hurting) {
+            p = Pose.HURT;
+            repeats = true;
         }
         else if (attacking) {
             if (jumping) {
@@ -238,13 +313,13 @@ public class Player extends Sprite {
     public void drawBoxes(Graphics pen) {
         // draw the box of the body
         pen.setColor(new Color(0, 0, 255, 50));
-        pen.fillRect((int)x, (int)y, w, h);
+        pen.fillRect((int)x - Camera.x, (int)y - Camera.y, w, h);
 
         // draw the hitbox
         if (attacking) {
             pen.setColor(new Color(255, 0, 0, 50));
-            Rect hitbox = getHitbox();
-            pen.fillRect((int)hitbox.x, (int)hitbox.y, hitbox.w, hitbox.h);
+            Rect hb = getHitbox();
+            pen.fillRect((int)hb.x - Camera.x, (int)hb.y - Camera.y, hb.w, hb.h);
         }
     }
 }
