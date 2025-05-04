@@ -10,6 +10,7 @@ public class Player extends Sprite {
 
     static int KNOCKBACK_X = 5;
     static int KNOCKBACK_Y = 10;
+    static int CROUCH_SHRINK_VALUE = 40;
 
     static int HITBOX_WIDTH = 80;
     static int HITBOX_NORMAL_HEIGHT = 108;
@@ -20,13 +21,13 @@ public class Player extends Sprite {
 
     static int ANIMATION_DURATION = 3;
     enum Pose {
-        IDLE, RUN, JUMP, JUMP_ATTACK_1, JUMP_ATTACK_2, ATTACK_1, ATTACK_2, ATTACK_3, HURT, DEATH
+        IDLE, RUN, JUMP, JUMP_ATTACK_1, JUMP_ATTACK_2, CROUCH, CROUCH_ATTACK, ATTACK_1, ATTACK_2, ATTACK_3, HURT, DEATH
     }
 
     static String[] poses = {
-            "idle", "run", "jump", "jump-attack1", "jump-attack2", "attack1", "attack2", "attack3", "hurt", "death"
+            "idle", "run", "jump", "jump-attack1", "jump-attack2", "crouch", "crouch-attack", "attack1", "attack2", "attack3", "hurt", "death"
     };
-    static int[] count = {8, 8, 9, 6, 5, 7, 5, 8, 2, 6};
+    static int[] count = { 8, 8, 9, 6, 5, 3, 10, 7, 5, 8, 2, 6 };
 
     double vx = 0;
     double vy = 0;
@@ -35,6 +36,7 @@ public class Player extends Sprite {
     int direction = 1;
 
     boolean jumping = false;
+    boolean crouching = false;
     boolean attacking = false;
     boolean hurting = false;
     boolean dying = false;
@@ -72,11 +74,41 @@ public class Player extends Sprite {
         vy = -JUMP;
         jumping = true;
 
-        // reset attack
-        if (attacking) {
-            canCombo = false;
-            attack();
+        if (crouching) {
+            stopCrouching();
         }
+
+        if (attacking) {
+            resetAttack();
+        }
+    }
+
+    public void crouch() {
+        if (crouching) return;
+
+        crouching = true;
+        y += CROUCH_SHRINK_VALUE;
+        h -= CROUCH_SHRINK_VALUE;
+
+        if (attacking) {
+            resetAttack();
+        }
+    }
+
+    private void stopCrouching() {
+        if (!crouching) return;
+
+        crouching = false;
+        y -= CROUCH_SHRINK_VALUE;
+        h += CROUCH_SHRINK_VALUE;
+
+        if (attacking) {
+            attacking = false;
+            canCombo = false;
+        }
+
+        // fixes a bug with performing multiple crouch attacks
+        updatePose();
     }
 
     public void ground() {
@@ -86,22 +118,7 @@ public class Player extends Sprite {
 
     public void attack() {
         if (canCombo) {
-            if (attackType == 1) {
-                attackType = 2;
-            }
-            else if (attackType == 2) {
-                if (jumping) {
-                    canCombo = false;
-                    return; // can't combo after 2nd attack when jumping
-                }
-                else {
-                    attackType = 3;
-                }
-            }
-            else {
-                canCombo = false;
-                return; // can't combo after 3rd attack
-            }
+            attackType++;
         }
         else {
             attackType = 1;
@@ -119,11 +136,14 @@ public class Player extends Sprite {
 
     public void calculateAttackDelay() {
         int p;
-        if (jumping) {
+        if (crouching) {
+            p = Pose.CROUCH_ATTACK.ordinal();
+        }
+        else if (jumping) {
             if (attackType == 1)
                 p = Pose.JUMP_ATTACK_1.ordinal();
             else
-                p = Pose.JUMP_ATTACK_1.ordinal();
+                p = Pose.JUMP_ATTACK_2.ordinal();
         }
         else {
             if (attackType == 1)
@@ -137,11 +157,20 @@ public class Player extends Sprite {
         attackDelay = ANIMATION_DURATION * count[p];
     }
 
+    private void resetAttack() {
+        canCombo = false;
+        attack();
+    }
+
     public boolean canMove() {
-        return !dying && !hurting && (!attacking || jumping);
+        return !dying && !hurting && !crouching && (!attacking || jumping);
     }
 
     public boolean canJump() {
+        return !dying && !hurting && !jumping;
+    }
+
+    public boolean canCrouch() {
         return !dying && !hurting && !jumping;
     }
 
@@ -235,8 +264,18 @@ public class Player extends Sprite {
             if (attackDelay == 0) {
                 attacking = false;
 
-                if (attackType < 3)
+                if (crouching) {
+                    canCombo = false;
+                }
+                else if (jumping && attackType < 2) {
                     canCombo = true;
+                }
+                else if (attackType < 3) {
+                    canCombo = true;
+                }
+                else {
+                    canCombo = false;
+                }
             }
             else {
                 attackDelay--;
@@ -244,6 +283,10 @@ public class Player extends Sprite {
         }
         else {
             canCombo = false;
+        }
+
+        if (crouching && !attacking) {
+            stopCrouching();
         }
 
         old_x = x;
@@ -262,7 +305,10 @@ public class Player extends Sprite {
             repeats = true;
         }
         else if (attacking) {
-            if (jumping) {
+            if (crouching) {
+                p = Pose.CROUCH_ATTACK;
+            }
+            else if (jumping) {
                 if (attackType == 2) {
                     p = Pose.JUMP_ATTACK_2;
                 } else {
@@ -285,6 +331,9 @@ public class Player extends Sprite {
         else if (jumping) {
             p = Pose.JUMP;
         }
+        else if (crouching) {
+            p = Pose.CROUCH;
+        }
         else if (vx != 0) {
             p = Pose.RUN;
             repeats = true;
@@ -301,10 +350,11 @@ public class Player extends Sprite {
         updatePose();
 
         int offset_x = direction < 0 ? 200 : -140;
+        int offset_y = crouching ? -124 : -84;
         pen.drawImage(
                 getImage(),
                 (int)(x + offset_x) - Camera.x,
-                (int)(y - 84) - Camera.y,
+                (int)(y + offset_y) - Camera.y,
                 direction * SPRITE_WIDTH * 4,
                 SPRITE_HEIGHT * 4,
                 null);
