@@ -180,7 +180,7 @@ public class Player extends Sprite {
     }
 
     public boolean canJump() {
-        return !dying && !hurting && !jumping && !charging;
+        return !dying && !hurting && !jumping;
     }
 
     public boolean canCrouch() {
