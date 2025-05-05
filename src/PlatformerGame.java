@@ -33,11 +33,26 @@ public class PlatformerGame extends GameBase {
         if (player.canAttack() && pressing[_U]) {
             player.attack();
         }
+        if (player.canShootSpell() && pressing[_I]) {
+            player.shootSpell();
+        }
 //        if (pressing[_I]) player.injureBy(new Rect(0,0,0,0), 1);
 //        if (pressing[_O]) player.die();
 //        if (pressing[_P]) player.revive();
 
         player.updatePosition();
+
+        for (int i = 0; i < Spell.spells.size(); i++) {
+            Spell s = Spell.spells.get(i);
+            s.beforeMove();;
+
+            if (s.done) {
+                Spell.spells.remove(s);
+                continue;
+            }
+
+            s.move();
+        }
 
 //        if (player.hits(enemy)) { player.registerHit(enemy); ... }
 //        if (enemy hits player) { player.injureBy(enemy, 1); ... }
@@ -66,7 +81,12 @@ public class PlatformerGame extends GameBase {
 
         TileMap.maps[TileMap.current].draw(pen);
         player.draw(pen);
-        player.drawBoxes(pen);
+//        player.drawBoxes(pen);
+
+        for (int i = 0; i < Spell.spells.size(); i++) {
+            Spell.spells.get(i).draw(pen);
+//            Spell.spells.get(i).drawBoxes(pen);
+        }
 
         //TileMap.maps[TileMap.current].draw(pen);
         //Rect[] bounds = TileMap.maps[TileMap.current].getBounds();
