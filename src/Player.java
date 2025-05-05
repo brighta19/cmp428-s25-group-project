@@ -21,13 +21,20 @@ public class Player extends Sprite {
 
     static int ANIMATION_DURATION = 3;
     enum Pose {
-        IDLE, RUN, JUMP, JUMP_ATTACK_1, JUMP_ATTACK_2, CROUCH, CROUCH_ATTACK, ATTACK_1, ATTACK_2, ATTACK_3, HURT, DEATH
-    }
+        IDLE, RUN, JUMP, JUMP_ATTACK_1, JUMP_ATTACK_2,
+        CROUCH, CROUCH_ATTACK, ATTACK_1, ATTACK_2, ATTACK_3,
+        CHARGE_SPELL, HURT, DEATH }
 
     static String[] poses = {
-            "idle", "run", "jump", "jump-attack1", "jump-attack2", "crouch", "crouch-attack", "attack1", "attack2", "attack3", "hurt", "death"
-    };
-    static int[] count = { 8, 8, 9, 6, 5, 3, 10, 7, 5, 8, 2, 6 };
+            "idle", "run", "jump", "jump-attack1", "jump-attack2",
+            "crouch", "crouch-attack", "attack1", "attack2", "attack3",
+            "charge-spell", "hurt", "death" };
+    static int[] count = {
+            8, 8, 9, 6, 5,
+            3, 10, 7, 5, 8,
+            13, 2, 6 };
+
+    static int SHOOT_SPELL_DELAY_VALUE = ANIMATION_DURATION * (count[Pose.CHARGE_SPELL.ordinal()] - 10);
 
     double vx = 0;
     double vy = 0;
@@ -40,6 +47,9 @@ public class Player extends Sprite {
     boolean attacking = false;
     boolean hurting = false;
     boolean dying = false;
+    boolean charging = false;
+
+    int chargeDelay = 0;
 
     int attackDelay = 0;
     int attackType = 1;
@@ -50,7 +60,7 @@ public class Player extends Sprite {
     int hurtDelay = 0;
 
     public Player(double x, double y) {
-        super("warrior", x, y, 60, 108, poses, count, ANIMATION_DURATION);
+        super("warrior/warrior", x, y, 60, 108, poses, count, ANIMATION_DURATION);
     }
 
     public void updatePosition() {
@@ -84,8 +94,6 @@ public class Player extends Sprite {
     }
 
     public void crouch() {
-        if (crouching) return;
-
         crouching = true;
         y += CROUCH_SHRINK_VALUE;
         h -= CROUCH_SHRINK_VALUE;
@@ -162,20 +170,29 @@ public class Player extends Sprite {
         attack();
     }
 
+    public void shootSpell() {
+        charging = true;
+        chargeDelay = ANIMATION_DURATION * count[Pose.CHARGE_SPELL.ordinal()];
+    }
+
     public boolean canMove() {
-        return !dying && !hurting && !crouching && (!attacking || jumping);
+        return !dying && !hurting && !crouching && !charging && (!attacking || jumping);
     }
 
     public boolean canJump() {
-        return !dying && !hurting && !jumping;
+        return !dying && !hurting && !jumping && !charging;
     }
 
     public boolean canCrouch() {
-        return !dying && !hurting && !jumping;
+        return !dying && !hurting && !jumping && !charging && !crouching;
     }
 
     public boolean canAttack() {
-        return !dying && !hurting && !attacking;
+        return !dying && !hurting && !attacking && !charging;
+    }
+
+    public boolean canShootSpell() {
+        return !dying && !hurting && !attacking && !charging;
     }
 
     public void setAcceleration(double ay) {
@@ -285,6 +302,20 @@ public class Player extends Sprite {
             canCombo = false;
         }
 
+        if (charging) {
+            if (chargeDelay == SHOOT_SPELL_DELAY_VALUE) {
+                Spell.shoot(x + (direction < 0 ? -Spell.SPRITE_WIDTH : w), y+40, direction);
+            }
+
+            if (chargeDelay == 0) {
+                charging = false;
+                updatePose();
+            }
+            else {
+                chargeDelay--;
+            }
+        }
+
         if (crouching && !attacking) {
             stopCrouching();
         }
@@ -327,6 +358,9 @@ public class Player extends Sprite {
                         p = Pose.ATTACK_1;
                 }
             }
+        }
+        else if (charging) {
+            p = Pose.CHARGE_SPELL;
         }
         else if (jumping) {
             p = Pose.JUMP;
