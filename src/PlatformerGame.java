@@ -4,17 +4,20 @@ public class PlatformerGame extends GameBase {
     final double GRAVITY = 1.1;
 
     static Player player = new Player(500, 200);
+    static Player enemy = new Player(1000, 200); // replace with actual enemies
 
     TileMap map;
 
     public void initialize() {
         player.setAcceleration(GRAVITY);
+        enemy.setAcceleration(GRAVITY);
         map = new TileMap("map1.txt" , 64);
         map = new TileMap("map2.txt" , 64);
     }
 
     public void inGameLoop() {
         player.beforeInput();
+        enemy.beforeInput();
 
         if (player.canCrouch() && (pressing[DN] || pressing[_S])) {
             player.crouch();
@@ -41,6 +44,7 @@ public class PlatformerGame extends GameBase {
 //        if (pressing[_P]) player.revive();
 
         player.updatePosition();
+        enemy.updatePosition();
 
         for (int i = 0; i < Spell.spells.size(); i++) {
             Spell s = Spell.spells.get(i);
@@ -52,9 +56,18 @@ public class PlatformerGame extends GameBase {
             }
 
             s.move();
+            if (s.hits(enemy)) {
+                s.dispel();
+                enemy.injureBy(s, 2);
+            }
         }
 
-//        if (player.hits(enemy)) { player.registerHit(enemy); ... }
+        if (player.hits(enemy)) {
+            player.registerHit(enemy);
+
+            int dmg = player.in_air ? 3 : 1;
+            enemy.injureBy(player, dmg);
+        }
 //        if (enemy hits player) { player.injureBy(enemy, 1); ... }
 
         player.in_air = true;
@@ -73,6 +86,13 @@ public class PlatformerGame extends GameBase {
                     player.ground();
                 }
             }
+            if(enemy.overlaps(bounds[i])) {
+                if(enemy.cameFromAbove()) {
+                    double dy = (enemy.y + enemy.h) - bounds[i].y;
+                    enemy.pushBy(0, -dy);
+                    enemy.ground();
+                }
+            }
         }
         map.checkIfNearEdge(player);
     }
@@ -83,6 +103,7 @@ public class PlatformerGame extends GameBase {
         TileMap.maps[TileMap.current].draw(pen);
         player.draw(pen);
 //        player.drawBoxes(pen);
+        enemy.draw(pen);
 
         for (int i = 0; i < Spell.spells.size(); i++) {
             Spell.spells.get(i).draw(pen);
