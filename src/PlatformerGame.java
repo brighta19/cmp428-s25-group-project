@@ -57,6 +57,7 @@ public class PlatformerGame extends GameBase {
 //        if (player.hits(enemy)) { player.registerHit(enemy); ... }
 //        if (enemy hits player) { player.injureBy(enemy, 1); ... }
 
+        player.in_air = true;
         if (player.y + player.h > 1000) {
             player.y = 1000 - player.h;
             player.ground();

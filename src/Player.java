@@ -42,7 +42,7 @@ public class Player extends Sprite {
     double ay = 0;
     int direction = 1;
 
-    boolean jumping = false;
+    boolean in_air = false;
     boolean crouching = false;
     boolean attacking = false;
     boolean hurting = false;
@@ -82,7 +82,7 @@ public class Player extends Sprite {
 
     public void jump() {
         vy = -JUMP;
-        jumping = true;
+        in_air = true;
 
         if (crouching) {
             stopCrouching();
@@ -121,7 +121,7 @@ public class Player extends Sprite {
 
     public void ground() {
         if (vy > 0) vy = 0;
-        jumping = false;
+        in_air = false;
     }
 
     public void attack() {
@@ -136,7 +136,7 @@ public class Player extends Sprite {
         targetsAlreadyHit.clear();
         calculateAttackDelay();
 
-//        if (vx != 0 && !jumping) {
+//        if (vx != 0 && !in_air) {
 //            // moves forward according to the length of the attack animation (nice for combos)
 //            x += direction * (SPEED * attackDelay/ANIMATION_DURATION);
 //        }
@@ -147,7 +147,7 @@ public class Player extends Sprite {
         if (crouching) {
             p = Pose.CROUCH_ATTACK.ordinal();
         }
-        else if (jumping) {
+        else if (in_air) {
             if (attackType == 1)
                 p = Pose.JUMP_ATTACK_1.ordinal();
             else
@@ -176,15 +176,15 @@ public class Player extends Sprite {
     }
 
     public boolean canMove() {
-        return !dying && !hurting && !crouching && !charging && (!attacking || jumping);
+        return !dying && !hurting && !crouching && !charging && (!attacking || in_air);
     }
 
     public boolean canJump() {
-        return !dying && !hurting && !jumping;
+        return !dying && !hurting && !in_air;
     }
 
     public boolean canCrouch() {
-        return !dying && !hurting && !jumping && !charging && !crouching;
+        return !dying && !hurting && !in_air && !charging && !crouching;
     }
 
     public boolean canAttack() {
@@ -201,7 +201,7 @@ public class Player extends Sprite {
 
     private Rect getHitbox() {
         double hitbox_x = x + (direction < 0 ? -HITBOX_WIDTH : w);
-        int hitbox_h = jumping ? HITBOX_JUMP_HEIGHT : HITBOX_NORMAL_HEIGHT;
+        int hitbox_h = in_air ? HITBOX_JUMP_HEIGHT : HITBOX_NORMAL_HEIGHT;
         return new Rect(
                 hitbox_x,
                 y,
@@ -284,7 +284,7 @@ public class Player extends Sprite {
                 if (crouching) {
                     canCombo = false;
                 }
-                else if (jumping && attackType < 2) {
+                else if (in_air && attackType < 2) {
                     canCombo = true;
                 }
                 else if (attackType < 3) {
@@ -339,7 +339,7 @@ public class Player extends Sprite {
             if (crouching) {
                 p = Pose.CROUCH_ATTACK;
             }
-            else if (jumping) {
+            else if (in_air) {
                 if (attackType == 2) {
                     p = Pose.JUMP_ATTACK_2;
                 } else {
@@ -362,7 +362,7 @@ public class Player extends Sprite {
         else if (charging) {
             p = Pose.CHARGE_SPELL;
         }
-        else if (jumping) {
+        else if (in_air) {
             p = Pose.JUMP;
         }
         else if (crouching) {
