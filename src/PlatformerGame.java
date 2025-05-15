@@ -5,19 +5,23 @@ public class PlatformerGame extends GameBase {
 
     static Player player = new Player(500, 200);
     static Player enemy = new Player(1000, 200); // replace with actual enemies
+    Hound dog = new Hound(700, 200);
 
     TileMap map;
 
     public void initialize() {
         player.setAcceleration(GRAVITY);
         enemy.setAcceleration(GRAVITY);
+        dog.setAcceleration(GRAVITY);
         map = new TileMap("map1.txt" , 64);
         map = new TileMap("map2.txt" , 64);
+
     }
 
     public void inGameLoop() {
         player.beforeInput();
         enemy.beforeInput();
+
 
         if (player.canCrouch() && (pressing[DN] || pressing[_S])) {
             player.crouch();
@@ -45,6 +49,7 @@ public class PlatformerGame extends GameBase {
 
         player.updatePosition();
         enemy.updatePosition();
+        dog.update();
 
         for (int i = 0; i < Spell.spells.size(); i++) {
             Spell s = Spell.spells.get(i);
@@ -93,6 +98,13 @@ public class PlatformerGame extends GameBase {
                     enemy.ground();
                 }
             }
+            if(dog.overlaps(bounds[i])) {
+                if(dog.cameFromAbove()) {
+                    double dy = (dog.y + dog.h) - bounds[i].y;
+                    dog.pushBy(0, -dy);
+                    dog.ground();
+                }
+            }
         }
         map.checkIfNearEdge(player);
     }
@@ -104,6 +116,7 @@ public class PlatformerGame extends GameBase {
         player.draw(pen);
 //        player.drawBoxes(pen);
         enemy.draw(pen);
+        dog.draw(pen);
 
         for (int i = 0; i < Spell.spells.size(); i++) {
             Spell.spells.get(i).draw(pen);
