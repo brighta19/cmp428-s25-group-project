@@ -1,113 +1,83 @@
 import java.awt.*;
 
 public class Enemy extends Sprite{
-
-    static final double INITIAL_HEALTH = 10;
-    static final double SPEED = 3;
-
-    public enum State { //Make it static?
+	
+	public enum State { //Make it static?
         IDLE, ATTACK, HURT, DEATH
     }
-
-//	protected State currentState = State.IDLE;
-//    protected boolean facingRight = true;
-
-    int health;
-    int hitboxHeight, hitboxWidth;
-
-    double vx = 0;
-    double vy = 0;
-    double ay = 0;
-    int direction = -1;
-
-    boolean inAir = false;
-    boolean dying = false;
-
-    public Enemy(String name, double x, double y, int w, int h, String[] poses, int[] counts, int duration) {
-        super(name, x, y, w, h, poses, counts, duration);
-    }
-
-    public void setAcceleration(double ay) {
-        this.ay = ay;
-    }
-
-    public void move() {
-        vy += ay;
-        x += vx;
-        y += vy;
-    }
-
-    public void moveLeft() {
-        vx = -SPEED;
-        direction = -1;
-    }
-
-    public void moveRight() {
-        vx = SPEED;
-        direction = 1;
-    }
-
-    public void ground() {
-        vy = 0;
-        inAir = false;
-    }
-
-    public void update() {
-        move();
-    }
-
-    public Rect getHitbox() {
-        double hitboxX = x + (direction < 0 ? -hitboxWidth : w);
-        return new Rect(hitboxX, y, hitboxWidth, hitboxHeight);
-    }
-
-    public boolean hits (Rect target){
-        return getHitbox().overlaps(target);
-    }
-
-    public void injure(Rect target, int damage) {
-        health -= damage;
-        if (health <= 0) {
-            die();
-        }
-    }
-
-    public void die() {
-        dying = true;
-    }
-
-    public boolean isDying() {
-        return dying;
-    }
-
-    public void updatePose() {
-        // Basic enemy pose logic placeholder. Should be overridden by subclasses.
-        if (vx != 0) {
-            moving = true;
-        } else {
-            moving = false;
-        }
-    }
-
-    @Override
-    public void draw(Graphics pen) {
-        updatePose();
-
-        Image img = animation[pose].nextImage();
-
-        int drawX = (int)x - Camera.x;
-        int drawY = (int)y - Camera.y;
-
-        if (direction == -1) {
-            pen.drawImage(img, drawX + w, drawY, -w, h, null); // flipped
-        } else {
-            pen.drawImage(img, drawX, drawY, w, h, null);      // normal
-        }
+	
+	protected State currentState = State.IDLE;
+    protected boolean facingRight = true;
+	
+    public Enemy(String name, int x, int y, int w, int h, String[] poses, int[] count, int duration) {
+        super(name, x, y, w, h, poses, count, duration);
     }
     
-//    public void setState(State newState) {
-//        currentState = newState;
-//        updatePose();
-//    }
+    /* thought of overriding the Sprite draw method to fix it not showing on the screen,
+     * but it didn't work. I will continue reviewing and editing the code.
+     */
+    @Override
+    public void draw(Graphics pen) {
+//        Image frame;
+//
+//        if (currentState == State.IDLE || moving) {
+//            frame = animation[pose].nextImage(); // animate
+//        } else {
+//            frame = animation[pose].stillImage(); // static frame
+//        }
+//
+//        pen.drawImage(frame, x, y, w, h, null);
+    	pen.drawImage(animation[pose].nextImage(), (int) x, (int) y, w, h, null);
+        moving = false;
+    }
+    
+    
+    public void setState(State newState) {
+        currentState = newState;
+        updatePoseIndex();
+    }
+
+    public void setFacingRight(boolean right) {
+        facingRight = right;
+        updatePoseIndex();
+    }
+    
+    public boolean isMoving() {
+        return moving;
+    }
+    
+    public void resetStateIfIdle() {
+        if (!moving && currentState != State.HURT && currentState != State.DEATH) {
+            setState(State.IDLE);
+        }
+    }
+
+    private void updatePoseIndex() {
+        // Assumes pose array uses naming like: idle_lt, idle_rt, attack_lt, attack_rt, etc.
+        // poseIndex is determined by (state.ordinal() * 2 + (facingRight ? 1 : 0))
+        pose = currentState.ordinal() * 2 + (facingRight ? 1 : 0);
+    }
+
+    // Optional helpers for movement
+    public void moveLeft(int dx) {
+        x -= dx;
+        setFacingRight(false);
+		setState(Enemy.State.ATTACK);
+        moving = true;
+    }
+
+    public void moveRight(int dx) {
+        x += dx;
+        setFacingRight(true);
+        setState(Enemy.State.ATTACK);
+        moving = true;
+    }
+
+    public void attackRight(int dx){
+        x += dx;
+        setFacingRight(true);
+        setState(Enemy.State.ATTACK);
+        moving = true;
+    }
 
 }
