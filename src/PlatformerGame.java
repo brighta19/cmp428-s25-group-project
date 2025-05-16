@@ -123,10 +123,20 @@ public class PlatformerGame extends GameBase {
 //            Spell.spells.get(i).drawBoxes(pen);
         }
 
+        drawPlayerHealthBar(pen);
+
         //TileMap.maps[TileMap.current].draw(pen);
         //Rect[] bounds = TileMap.maps[TileMap.current].getBounds();
         //for (Rect bound : bounds) {
         //pen.drawRect((int)bound.x, (int)bound.y, bound.w, bound.h);
         //}
+    }
+
+    public void drawPlayerHealthBar(Graphics pen) {
+        int width = 300;
+        pen.setColor(Color.WHITE);
+        pen.fillRect(20, 20, (int) width, 40);
+        pen.setColor(Color.RED);
+        pen.fillRect(20, 20, (int) (player.getHealthPercentage() * width), 40);
     }
 }
