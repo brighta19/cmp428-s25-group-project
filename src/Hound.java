@@ -1,6 +1,6 @@
 public class Hound extends Enemy {
 
-    static final String[] POSES = { "idle_rt", "attack_rt", "death_rt" };
+    static final String[] POSES = { "idle", "attack", "death" };
     static final int[] COUNTS = { 6, 5, 8 }; // Example frame counts
 
     static final int POSE_IDLE = 0;
@@ -8,7 +8,7 @@ public class Hound extends Enemy {
     static final int POSE_DEATH = 2;
 
     public Hound(double x, double y) {
-        super("hound", x, y, 128, 128, POSES, COUNTS, 5);
+        super("Skullwolf/swolf", x, y, 128, 128, POSES, COUNTS, 5);
     }
 
     @Override

@@ -98,7 +98,7 @@ public class Enemy extends Sprite{
         int drawX = (int)x - Camera.x;
         int drawY = (int)y - Camera.y;
 
-        if (direction == -1) {
+        if (direction == 1) {
             pen.drawImage(img, drawX + w, drawY, -w, h, null); // flipped
         } else {
             pen.drawImage(img, drawX, drawY, w, h, null);      // normal
