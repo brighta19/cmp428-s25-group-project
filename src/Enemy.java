@@ -96,8 +96,8 @@ public class Enemy extends Sprite{
     }
 
     public void attackPlayer(Player player) {
-        if (attacking && !hasHitPlayer && getHitbox().overlaps(player.getHitbox())) {
-            player.injureBy(getHitbox(), 1);
+        if (attacking && !hasHitPlayer && getHitbox().overlaps(player)) {
+            player.injureBy(this, 1);
             hasHitPlayer = true;
         }
     }

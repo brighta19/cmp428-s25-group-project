@@ -103,7 +103,7 @@ public class PlatformerGame extends GameBase {
 
         for (Enemy e : enemies) {
             if (player.hits(e)) {
-                e.injure(player.getHitbox(), 2);
+                e.injure(player, 2);
             }
         }
 
