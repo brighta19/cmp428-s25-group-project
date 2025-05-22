@@ -203,7 +203,7 @@ public class Player extends Sprite {
         return (double) health / INITIAL_HEALTH;
     }
 
-    private Rect getHitbox() {
+    public Rect getHitbox() {
         double hitbox_x = x + (direction < 0 ? -HITBOX_WIDTH : w);
         int hitbox_h = in_air ? HITBOX_JUMP_HEIGHT : HITBOX_NORMAL_HEIGHT;
         return new Rect(

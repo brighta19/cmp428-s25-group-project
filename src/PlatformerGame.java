@@ -1,18 +1,29 @@
 import java.awt.*;
+import java.util.ArrayList;
 
 public class PlatformerGame extends GameBase {
     final double GRAVITY = 1.1;
 
     static Player player = new Player(500, 200);
     static Player enemy = new Player(1000, 200); // replace with actual enemies
-    Hound dog = new Hound(700, 200);
+
+    ArrayList<Enemy> enemies = new ArrayList<>(); // to add multiple enemies
 
     TileMap map;
 
     public void initialize() {
         player.setAcceleration(GRAVITY);
         enemy.setAcceleration(GRAVITY);
-        dog.setAcceleration(GRAVITY);
+
+        Hound dog = new Hound(1200, 200, player);
+        Rogue rog = new Rogue(1500, 200, player);
+        enemies.add(dog);
+        enemies.add(rog);
+
+        for (Enemy e : enemies) {
+            e.setAcceleration(GRAVITY);
+        }
+
         map = new TileMap("map1.txt" , 64);
         map = new TileMap("map2.txt" , 64);
 
@@ -49,7 +60,10 @@ public class PlatformerGame extends GameBase {
 
         player.updatePosition();
         enemy.updatePosition();
-        dog.update();
+
+//        for (Enemy e: enemies){
+//            e.update();
+//        }
 
         for (int i = 0; i < Spell.spells.size(); i++) {
             Spell s = Spell.spells.get(i);
@@ -60,10 +74,16 @@ public class PlatformerGame extends GameBase {
                 continue;
             }
 
+            if (s.dispelling) continue;
+
             s.move();
-            if (s.hits(enemy)) {
-                s.dispel();
-                enemy.injureBy(s, 2);
+
+            // check if it hits an enemy
+            for (Enemy e : enemies) {
+                if (!e.isDying() && s.hits(e)) {
+                    e.injure(s, 2); // for example, deal 3 damage
+                    s.dispel();     // remove or trigger the end of the spell
+                }
             }
         }
 
@@ -79,6 +99,12 @@ public class PlatformerGame extends GameBase {
         if (player.y + player.h > 1000) {
             player.y = 1000 - player.h;
             player.ground();
+        }
+
+        for (Enemy e : enemies) {
+            if (player.hits(e)) {
+                e.injure(player.getHitbox(), 2);
+            }
         }
 
         Rect[] bounds = TileMap.maps[TileMap.current].getBounds();
@@ -98,14 +124,28 @@ public class PlatformerGame extends GameBase {
                     enemy.ground();
                 }
             }
-            if(dog.overlaps(bounds[i])) {
-                if(dog.cameFromAbove()) {
-                    double dy = (dog.y + dog.h) - bounds[i].y;
-                    dog.pushBy(0, -dy);
-                    dog.ground();
+            for (Enemy e : enemies) {
+                if (e.overlaps(bounds[i])) {
+                    if (e.cameFromAbove()) {
+                        double dy = (e.y + e.h) - bounds[i].y;
+                        e.pushBy(0, -dy);
+                        e.ground();
+                    }
                 }
             }
         }
+
+        // remove dead enemies
+        for (int i = 0; i < enemies.size(); i++) {
+            Enemy e = enemies.get(i);
+            e.update();
+
+            if (e.isDead()) {
+                enemies.remove(i);
+                i--; // avoid skipping next enemy
+            }
+        }
+
         map.checkIfNearEdge(player);
     }
 
@@ -114,9 +154,14 @@ public class PlatformerGame extends GameBase {
 
         TileMap.maps[TileMap.current].draw(pen);
         player.draw(pen);
-//        player.drawBoxes(pen);
+        player.drawBoxes(pen);
         enemy.draw(pen);
-        dog.draw(pen);
+
+        // draw multiple enemies
+        for (Enemy e : enemies) {
+            e.draw(pen);
+            e.drawBoxes(pen);
+        }
 
         for (int i = 0; i < Spell.spells.size(); i++) {
             Spell.spells.get(i).draw(pen);

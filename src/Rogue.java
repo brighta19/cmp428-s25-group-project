@@ -1,12 +1,13 @@
-public class Hound extends Enemy {
+public class Rogue extends Enemy {
 
-    static final String[] POSES = { "walk", "attack","hurt", "death" };
-    static final int[] COUNTS = { 6, 5, 4, 8 }; // Example frame counts
+    static final String[] POSES = { "idle", "attack", "walk", "pre_attack", "death" };
+    static final int[] COUNTS = { 6, 4, 6, 6, 6 }; // Example frame counts
 
     static final int POSE_IDLE = 0;
     static final int POSE_ATTACK = 1;
-    static final int POSE_HURT = 2;
-    static final int POSE_DEATH = 3;
+    static final int POSE_WALK = 2;
+    static final int POSE_HURT = 3; // uses pre-attack animation
+    static final int POSE_DEATH = POSE_HURT; // same as POSE_HURT
 
     private int idleTimer = 0;
     private static final int IDLE_DURATION = 180;
@@ -20,19 +21,30 @@ public class Hound extends Enemy {
 
     private final Player player;
 
-    public Hound(double x, double y, Player player) {
-        super("Skullwolf/swolf", x, y, 128, 128, POSES, COUNTS, 5);
+    public Rogue(double x, double y, Player player) {
+        super("rogue/rogue", x, y, 128, 128, POSES, COUNTS, 5);
         this.health = 10;
-        this.hitboxWidth = 108;
-        this.hitboxHeight = 32;
-        this.hitboxOffsetX = 20;
-        this.hitboxOffsetY = 80;
+        this.hitboxWidth = 40;
+        this.hitboxHeight = 96;
+        this.hitboxOffsetX = 40;
+        this.hitboxOffsetY = 16;
 
         this.leftBound = x - 50;
         this.rightBound = x + 50;
         this.player = player;
     }
 
+    @Override
+    public void moveLeft() {
+        vx = -SPEED;
+        direction = 1; // face right (for right-facing sprite)
+    }
+
+    @Override
+    public void moveRight() {
+        vx = SPEED;
+        direction = -1; // face left
+    }
 
     @Override
     public void updatePose() {
@@ -43,10 +55,18 @@ public class Hound extends Enemy {
         } else if (hurting) {
             setPose(POSE_HURT, true, false);  // walk loops
         } else if (Math.abs(vx) > 0.1){
-            setPose(POSE_ATTACK, true, true); // Uses attack animations for movement
+            setPose(POSE_WALK, true, true); // Uses attack animations for movement
         } else {
             setPose(POSE_IDLE, false, true);  // idle loops
         }
+    }
+
+    // Having trouble getting the hitboxes right
+    @Override
+    public Rect getHitbox() {
+        double hitboxX = x + (direction < 0 ? w : -w + hitboxWidth + hitboxOffsetX);
+        double hitboxY = y + hitboxOffsetY;
+        return new Rect(hitboxX, hitboxY, hitboxWidth, hitboxHeight);
     }
 
     // Add movement logic or AI
