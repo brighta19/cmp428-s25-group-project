@@ -20,7 +20,7 @@ public class Enemy extends Sprite{
     int attackCooldown = 60;
     int attackAnimationTime = 0;
     int hurtDelay = 0;
-    int HURT_DURATION = 40;
+    int HURT_DURATION = 20;
 
     double vx = 0;
     double vy = 0;
@@ -67,7 +67,7 @@ public class Enemy extends Sprite{
     }
 
     public void ground() {
-        vy = 0;
+        if (vy > 0) vy = 0;
         inAir = false;
     }
 
@@ -77,6 +77,9 @@ public class Enemy extends Sprite{
             if (hurtDelay <= 0) {
                 hurting = false;
             }
+            vy += ay;
+            x += vx;
+            y += vy;
         }
         else if (!dying) {
             move();
@@ -113,7 +116,6 @@ public class Enemy extends Sprite{
         return getHitbox().overlaps(target);
     }
 
-    // It's not really working
     private void knockBack(int direction) {
         if (!dying) {
             vx = direction * 5;

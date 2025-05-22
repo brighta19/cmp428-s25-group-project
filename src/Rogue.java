@@ -91,7 +91,7 @@ public class Rogue extends Enemy {
                         attackPlayer(player);
                         System.out.println("Hound attacked player!");
                     }
-                    else {
+                    else if (!hurting) {
                         double dx = player.x - this.x;
                         if (dx > 5) {
                             moveRight();
@@ -108,7 +108,7 @@ public class Rogue extends Enemy {
 
         }
 
-        if (!chasing && !attacking && !idling) {
+        if (!chasing && !attacking && !idling && !hurting) {
             if (movingRight) {
                 moveRight();
                 if (x >= rightBound) {
@@ -130,7 +130,7 @@ public class Rogue extends Enemy {
 
         if (idling) {
             idleTimer--;
-            vx = 0;
+            if (!hurting) vx = 0;
 
             if (idleTimer <= 0) {
                 idling = false;
