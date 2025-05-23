@@ -77,7 +77,15 @@ public abstract class GameBase extends Applet implements Runnable, KeyListener {
 	public static final int F10         = KeyEvent.VK_F10;
 	public static final int F11         = KeyEvent.VK_F11;
 	public static final int F12         = KeyEvent.VK_F12;
-	
+
+	int width;
+	int height;
+	public GameBase(int width, int height) {
+		super();
+		this.width = width;
+		this.height = height;
+	}
+
 	public abstract void initialize();
 	
 	public abstract void inGameLoop();
@@ -110,7 +118,7 @@ public abstract class GameBase extends Applet implements Runnable, KeyListener {
 	public void update(Graphics pen) {
 		offScreen_pen.clearRect(0, 0, 1920, 1080);
 		paint(offScreen_pen);
-		pen.drawImage(offScreen, 0, 0, null);
+		pen.drawImage(offScreen, 0, 0,width, height,null);
 	}
 	
 	public void keyPressed(KeyEvent e) {

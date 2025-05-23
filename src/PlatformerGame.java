@@ -11,6 +11,10 @@ public class PlatformerGame extends GameBase {
 
     TileMap map;
 
+    public PlatformerGame(int width, int height) {
+        super(width, height);
+    }
+
     public void initialize() {
         player.setAcceleration(GRAVITY);
         enemy.setAcceleration(GRAVITY);
