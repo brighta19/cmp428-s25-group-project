@@ -4,6 +4,8 @@ import java.util.ArrayList;
 public class PlatformerGame extends GameBase {
     final double GRAVITY = 1.1;
 
+    int level = 1;
+
     static Player player = new Player(500, 200);
     static Player enemy = new Player(1000, 200); // replace with actual enemies
 
@@ -29,7 +31,9 @@ public class PlatformerGame extends GameBase {
         }
 
         map = new TileMap("map1.txt" , 64);
-        map = new TileMap("map2.txt" , 64);
+       map = new TileMap("map2.txt" , 64);
+        level = TileMap.current + 1;
+
 
     }
 
@@ -174,6 +178,9 @@ public class PlatformerGame extends GameBase {
         }
 
         drawPlayerHealthBar(pen);
+        pen.setColor(Color.YELLOW);//lol
+        pen.setFont(new Font("Arial", Font.BOLD, 36));
+        pen.drawString("Level " + level, getWidth() - 200, 50);
 
         //TileMap.maps[TileMap.current].draw(pen);
         //Rect[] bounds = TileMap.maps[TileMap.current].getBounds();

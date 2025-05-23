@@ -152,7 +152,7 @@ public class TileMap extends RoomBase
 
 	//checks if the player is near the edge of the map to do a transition
 	//if so transitions automatically
-	public void checkIfNearEdge(Player player) {
+	/*public void checkIfNearEdge(Player player) {
 		 if( player.x < (maps[current].getLeftLimit() - 10) && (current != 0)) {
 //	        	changeCurrent(current - 1);
 	        	player.x = maps[current].getRightLimit() - 20;
@@ -163,7 +163,26 @@ public class TileMap extends RoomBase
 	        	player.x = maps[current].getLeftLimit();
 	        	Camera.x = maps[current].getLeftLimit();
 		 }
+	}*/
+
+	public void checkIfNearEdge(Player player) {
+		if (player.x < (maps[current].getLeftLimit() - 10) && current > 0) {
+			current--;
+			player.x = maps[current].getRightLimit() - 20;
+			Camera.x = maps[current].getRightLimit() - 1920;
+
+			((PlatformerGame) GameBase.instance).level = current + 1;
+		}
+
+		if (player.x > (maps[current].getRightLimit() - 10) && current < maps.length - 1) {
+			current++;
+			player.x = maps[current].getLeftLimit();
+			Camera.x = maps[current].getLeftLimit();
+
+			((PlatformerGame) GameBase.instance).level = current + 1;
+		}
 	}
+
 
 	public int getLeftLimit() { return lx_limit; }
 	public int getRightLimit() { return rx_limit; }

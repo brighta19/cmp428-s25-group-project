@@ -7,6 +7,7 @@ public abstract class GameBase extends Applet implements Runnable, KeyListener {
 	Graphics offScreen_pen;
 
 	Thread t;
+	public static GameBase instance;
 
 	static boolean[] pressing = new boolean[1024];
 
@@ -91,6 +92,8 @@ public abstract class GameBase extends Applet implements Runnable, KeyListener {
 	public abstract void inGameLoop();
 	
 	public void init() {
+		instance = this;
+
 		offScreen = this.createImage(1920, 1080);
 		offScreen_pen = offScreen.getGraphics();
 
