@@ -181,7 +181,9 @@ public class TileMap extends RoomBase
 			player.old_x = maps[current].getLeftLimit();
 			Camera.x = maps[current].getLeftLimit();
 
-			((PlatformerGame) GameBase.instance).level = current + 1;
+			PlatformerGame game = (PlatformerGame) GameBase.instance;
+			game.level = current + 1;
+			game.respawnEnemies();
 		}
 	}
 

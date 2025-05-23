@@ -196,4 +196,16 @@ public class PlatformerGame extends GameBase {
         pen.setColor(Color.RED);
         pen.fillRect(20, 20, (int) (player.getHealthPercentage() * width), 40);
     }
+
+    public void respawnEnemies() {
+        enemies.clear();
+        Hound dog = new Hound(1200, 100, player);
+        Rogue rog = new Rogue(1500, 100, player);
+        enemies.add(dog);
+        enemies.add(rog);
+
+        for (Enemy e : enemies) {
+            e.setAcceleration(GRAVITY);
+        }
+    }
 }
