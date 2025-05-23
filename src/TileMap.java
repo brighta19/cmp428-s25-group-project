@@ -169,6 +169,7 @@ public class TileMap extends RoomBase
 		if (player.x < (maps[current].getLeftLimit() - 10) && current > 0) {
 			current--;
 			player.x = maps[current].getRightLimit() - 20;
+			player.old_x = maps[current].getRightLimit() - 20;
 			Camera.x = maps[current].getRightLimit() - 1920;
 
 			((PlatformerGame) GameBase.instance).level = current + 1;
@@ -177,6 +178,7 @@ public class TileMap extends RoomBase
 		if (player.x > (maps[current].getRightLimit() - 10) && current < maps.length - 1) {
 			current++;
 			player.x = maps[current].getLeftLimit();
+			player.old_x = maps[current].getLeftLimit();
 			Camera.x = maps[current].getLeftLimit();
 
 			((PlatformerGame) GameBase.instance).level = current + 1;
