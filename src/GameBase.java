@@ -3,6 +3,9 @@ import java.awt.event.*;
 import java.applet.Applet;
 
 public abstract class GameBase extends Applet implements Runnable, KeyListener {
+	static int WIDTH = 1920;
+	static int HEIGHT = 1080;
+
 	Image offScreen;
 	Graphics offScreen_pen;
 
@@ -94,7 +97,7 @@ public abstract class GameBase extends Applet implements Runnable, KeyListener {
 	public void init() {
 		instance = this;
 
-		offScreen = this.createImage(1920, 1080);
+		offScreen = this.createImage(WIDTH, HEIGHT);
 		offScreen_pen = offScreen.getGraphics();
 
 		initialize();
@@ -119,7 +122,7 @@ public abstract class GameBase extends Applet implements Runnable, KeyListener {
 	}
 	
 	public void update(Graphics pen) {
-		offScreen_pen.clearRect(0, 0, 1920, 1080);
+		offScreen_pen.clearRect(0, 0, WIDTH, HEIGHT);
 		paint(offScreen_pen);
 		pen.drawImage(offScreen, 0, 0,width, height,null);
 	}

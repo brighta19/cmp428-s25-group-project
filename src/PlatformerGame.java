@@ -180,7 +180,7 @@ public class PlatformerGame extends GameBase {
         drawPlayerHealthBar(pen);
         pen.setColor(Color.YELLOW);//lol
         pen.setFont(new Font("Arial", Font.BOLD, 36));
-        pen.drawString("Level " + level, getWidth() - 200, 50);
+        pen.drawString("Level " + level, WIDTH - 200, 50);
 
         //TileMap.maps[TileMap.current].draw(pen);
         //Rect[] bounds = TileMap.maps[TileMap.current].getBounds();
