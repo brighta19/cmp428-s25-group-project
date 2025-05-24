@@ -24,7 +24,7 @@ public class Animation {
 
     public void reset() {
         current = 0;
-        delay = 0;
+        delay = duration;
         done = false;
     }
 

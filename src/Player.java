@@ -19,7 +19,7 @@ public class Player extends Sprite {
     static int SPRITE_WIDTH = 80;
     static int SPRITE_HEIGHT = 64;
 
-    static int ANIMATION_DURATION = 3;
+    static int ANIMATION_DURATION = 4;
     enum Pose {
         IDLE, RUN, JUMP, JUMP_ATTACK_1, JUMP_ATTACK_2,
         CROUCH, CROUCH_ATTACK, ATTACK_1, ATTACK_2, ATTACK_3,
@@ -34,7 +34,7 @@ public class Player extends Sprite {
             3, 10, 7, 5, 8,
             13, 2, 6 };
 
-    static int SHOOT_SPELL_DELAY_VALUE = ANIMATION_DURATION * (count[Pose.CHARGE_SPELL.ordinal()] - 10);
+    static int SHOOT_SPELL_DELAY_VALUE = ANIMATION_DURATION * (count[Pose.CHARGE_SPELL.ordinal()] - 8);
 
     double vx = 0;
     double vy = 0;
@@ -60,7 +60,7 @@ public class Player extends Sprite {
     int hurtDelay = 0;
 
     public Player(double x, double y) {
-        super("warrior/warrior", x, y, 60, 108, poses, count, ANIMATION_DURATION);
+        super("warrior/warrior", x, y, 60, 108, poses, count, ANIMATION_DURATION-1);
     }
 
     public void updatePosition() {
@@ -114,9 +114,6 @@ public class Player extends Sprite {
             attacking = false;
             canCombo = false;
         }
-
-        // fixes a bug with performing multiple crouch attacks
-        updatePose();
     }
 
     public void ground() {
@@ -273,7 +270,7 @@ public class Player extends Sprite {
         }
 
         if (hurting) {
-            if (hurtDelay == 0) {
+            if (hurtDelay == 1) {
                 hurting = false;
             }
             else {
@@ -282,7 +279,7 @@ public class Player extends Sprite {
         }
 
         if (attacking) {
-            if (attackDelay == 0) {
+            if (attackDelay == 1) {
                 attacking = false;
 
                 if (crouching) {
@@ -311,7 +308,7 @@ public class Player extends Sprite {
                 Spell.shoot(x + (direction < 0 ? -Spell.SPRITE_WIDTH : w), y+40, direction);
             }
 
-            if (chargeDelay == 0) {
+            if (chargeDelay == 1) {
                 charging = false;
                 updatePose();
             }
@@ -342,6 +339,7 @@ public class Player extends Sprite {
         else if (attacking) {
             if (crouching) {
                 p = Pose.CROUCH_ATTACK;
+                repeats = true;
             }
             else if (in_air) {
                 if (attackType == 2) {
