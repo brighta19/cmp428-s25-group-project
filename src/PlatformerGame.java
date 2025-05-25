@@ -23,6 +23,9 @@ public class PlatformerGame extends GameBase {
 
         Hound dog = new Hound(1200, 200, player);
         Rogue rog = new Rogue(1500, 200, player);
+        Reaper reaper = new Reaper(2000,200 ,player);
+
+        enemies.add(reaper);
         enemies.add(dog);
         enemies.add(rog);
 
@@ -201,6 +204,9 @@ public class PlatformerGame extends GameBase {
         enemies.clear();
         Hound dog = new Hound(1200, 100, player);
         Rogue rog = new Rogue(1500, 100, player);
+        Reaper reaper = new Reaper(1000,200 ,player);
+
+        enemies.add(reaper);
         enemies.add(dog);
         enemies.add(rog);
 
