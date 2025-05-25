@@ -37,7 +37,10 @@ public class KnightsTaleEntrance extends Applet implements ActionListener {
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == startButton) {
             // Proceed to the next screen
-            PlatformerGame game = new PlatformerGame();
+            Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
+            double ratio = 9.0 / 16;
+            int height = (int) (screen.width * ratio);
+            PlatformerGame game = new PlatformerGame(screen.width, height);
 
             game.setSize(frame.getSize()); // match parent size
             frame.setContentPane(game);       // Add new content (enemy screen)
