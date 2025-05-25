@@ -5,6 +5,9 @@ public class PlatformerGame extends GameBase {
     final double GRAVITY = 1.1;
 
     int level = 1;
+    boolean isGameOver = false;
+    Button restartButton;
+    Button exitButton;
 
     static Player player = new Player(500, 200);
     static Player enemy = new Player(1000, 200); // replace with actual enemies
@@ -34,13 +37,23 @@ public class PlatformerGame extends GameBase {
        map = new TileMap("map2.txt" , 64);
         level = TileMap.current + 1;
 
+        int centerX = WIDTH / 2 - 100;
+        restartButton = new Button(centerX, HEIGHT / 2 - 50, 200, 50, "Restart");
+        exitButton = new Button(centerX, HEIGHT / 2 + 20, 200, 50, "Exit");
+
 
     }
 
     public void inGameLoop() {
+        if (isGameOver) return; // ⛔ Stop updating logic if game is over
+
         player.beforeInput();
         enemy.beforeInput();
 
+        if (player.dying || player.y > 1080) {
+            isGameOver = true;
+            return;
+        }
 
         if (player.canCrouch() && (pressing[DN] || pressing[_S])) {
             player.crouch();
@@ -104,10 +117,10 @@ public class PlatformerGame extends GameBase {
 //        if (enemy hits player) { player.injureBy(enemy, 1); ... }
 
         player.in_air = true;
-        if (player.y + player.h > 1000) {
-            player.y = 1000 - player.h;
-            player.ground();
-        }
+//        if (player.y + player.h > 1000) {
+//            player.y = 1000 - player.h;
+//            player.ground();
+//        }
 
         for (Enemy e : enemies) {
             if (player.hits(e)) {
@@ -187,7 +200,33 @@ public class PlatformerGame extends GameBase {
         //for (Rect bound : bounds) {
         //pen.drawRect((int)bound.x, (int)bound.y, bound.w, bound.h);
         //}
+
+        if (isGameOver) {
+            pen.setColor(new Color(0, 0, 0, 180)); // transparent overlay
+            pen.fillRect(0, 0, WIDTH, HEIGHT);
+
+            pen.setColor(Color.WHITE);
+            pen.setFont(new Font("Arial", Font.BOLD, 48));
+            pen.drawString("Game Over", WIDTH / 2 - 150, 300);
+
+            restartButton.draw(pen);  // ✅ pen is available here
+            exitButton.draw(pen);     // ✅ pen is available here
+        }
+
     }
+    public void resetGame() {
+        player.revive();
+        player.x = 500;
+        player.y = 200;
+        player.old_x = 500;
+
+        isGameOver = false;
+        level = 1;
+        TileMap.current = 0;
+        Camera.setLocation(0, 0);
+        respawnEnemies();
+    }
+
 
     public void drawPlayerHealthBar(Graphics pen) {
         int width = 300;

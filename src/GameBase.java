@@ -2,7 +2,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.applet.Applet;
 
-public abstract class GameBase extends Applet implements Runnable, KeyListener {
+public abstract class GameBase extends Applet implements Runnable, KeyListener, MouseListener {
 	static int WIDTH = 1920;
 	static int HEIGHT = 1080;
 
@@ -93,7 +93,7 @@ public abstract class GameBase extends Applet implements Runnable, KeyListener {
 	public abstract void initialize();
 	
 	public abstract void inGameLoop();
-	
+
 	public void init() {
 		instance = this;
 
@@ -103,12 +103,17 @@ public abstract class GameBase extends Applet implements Runnable, KeyListener {
 		initialize();
 
 		addKeyListener(this);
+		addMouseListener(this); // This registers the listener implemented below
+
+
 		requestFocus();
 
 		t = new Thread(this);
 		t.start();
 	}
-	
+
+
+
 	public void run() {
 		while (true) {
 			inGameLoop();
@@ -126,7 +131,36 @@ public abstract class GameBase extends Applet implements Runnable, KeyListener {
 		paint(offScreen_pen);
 		pen.drawImage(offScreen, 0, 0,width, height,null);
 	}
-	
+	@Override
+	public void mousePressed(MouseEvent e) {
+		if (!(instance instanceof PlatformerGame)) return;
+		PlatformerGame game = (PlatformerGame) instance;
+
+		if (game.isGameOver) {
+			// Scale mouse input from component size to virtual resolution
+			int mx = e.getX() * WIDTH / getWidth();
+			int my = e.getY() * HEIGHT / getHeight();
+
+			System.out.println("Mouse clicked at: " + mx + ", " + my);
+
+			if (game.restartButton.isClicked(mx, my)) {
+				System.out.println("Restart clicked");
+				game.resetGame();
+			} else if (game.exitButton.isClicked(mx, my)) {
+				System.out.println("Exit clicked");
+				System.exit(0);
+			}
+		}
+	}
+
+
+	@Override public void mouseReleased(MouseEvent e) {}
+	@Override public void mouseClicked(MouseEvent e) {}
+	@Override public void mouseEntered(MouseEvent e) {}
+	@Override public void mouseExited(MouseEvent e) {}
+
+
+
 	public void keyPressed(KeyEvent e) {
 		pressing[e.getKeyCode()] = true;
 	}
