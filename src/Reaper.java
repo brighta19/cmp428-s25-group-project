@@ -1,76 +1,118 @@
-public class SkullWolf extends Enemy {
+public class Reaper extends Enemy {
 
-    static final String [] pose = new String[]{"attack", "death", "hurt", "walk"};
-
-    static final int [] count = { 5, 7, 4, 6};
+    static final String[] pose = new String[]{"attack", "death", "hurt", "walk"};
+    static final int[] count = {8, 12, 2, 8};
 
     static final int attack = 0;
-    static final int death  = 1;
-    static final int hurt   = 2;
-    static  final int walk   = 3;
+    static final int death = 1;
+    static final int hurt = 2;
+    static final int walk = 3;
 
-    private int idleTimer = 0;
-    private static final int IDLE_DURATION = 180;
-    private static final double CHASE_RANGE = 230;
+    private static final double CHASE_RANGE = 300;
+    private static final double TELEPORT_THRESHOLD = 80;
+    private static final int TELEPORT_COOLDOWN = 120;
+    private boolean deathPoseSet = false;
 
     private final Player player;
+    private int teleportTimer = 0;
 
-    public SkullWolf(double x, double y) {
-        super("swolf", x, y, 80, 80, pose, count, 5);
+
+    public Reaper(double x, double y, Player player) {
+        super("reaper/reaper", x, y, 150, 150, pose, count, 5);
+        this.health = 10;
+        this.hitboxWidth = 108;
+        this.hitboxHeight = 32;
+        this.hitboxOffsetX = 20;
+        this.hitboxOffsetY = 80;
+        this.player = player;
     }
 
     @Override
     public void update() {
+        boolean chasing = false;
 
-        if (hurting) {
-            if (hurtDelay <= 0) {
-                hurting = false;
-                hurtDelay = 20;
-            } else {
-                hurtDelay--;
+        if (hurtDelay > 0) {
+            hurtDelay--;
+            if (hurtDelay == 0) hurting = false;
+        }
+
+        if (dying || hurting) {
+            super.update();
+            return;
+        }
+
+        if (player != null && !dying) {
+            double distance = Math.abs(player.x - this.x);
+            if (distance <= CHASE_RANGE) {
+                chasing = true;
+                if (canAttack(player)) {
+                    tryAttack(player);
+                }
+                if (attacking) {
+                    attackPlayer(player);
+                } else {
+                    if (distance < TELEPORT_THRESHOLD && teleportTimer <= 0) {
+                        if (player.x < this.x) {
+                            this.x = player.x - 300;
+
+                        } else {
+                            this.x = player.x + 300;
+
+                        }
+                        vx = 0;
+                        teleportTimer = TELEPORT_COOLDOWN;
+                    } double dx = player.x - this.x;
+                    if (dx > 3) {
+                        moveRight();
+                        direction = 1;
+                    } else if (dx < -3) {
+                        moveLeft();
+                        direction = -1;
+                    } else {
+                        vx = 0;
+                    }
+                    teleportTimer--;
+
+                }
             }
         }
 
-        if (!dying && !hurting) {
-            if (x < 100) {
-                moveRight();
-            } else if (x > 300) {
-                moveLeft();
-            }
+        if (!chasing && !dying && !hurting) {
+            vx = 0;
         }
-
-        super.update(); // position and animation
+        super.update();
     }
 
     @Override
     public void updatePose() {
-        int nextPose;
-
         if (dying) {
-            nextPose = death;
-            setPose(nextPose, false, false);
+            if (!deathPoseSet) {
+                setPose(death, true, false); // non-looping death animation
+                deathPoseSet = true;
+            }
             return;
         }
-
         if (hurting) {
-            nextPose = hurt;
-            setPose(nextPose, false, false);
+            setPose(hurt, true, false);
             return;
         }
-
+        if (attacking) {
+            setPose(attack, true, true);
+            return;
+        }
         if (vx != 0) {
-            nextPose = walk;
-            setPose(nextPose, false, true);
-            return;
+            setPose(walk, true, true);
         }
-            nextPose = attack;
-            setPose(nextPose, false, true);
+        else {
+            // Stay still on the first frame of walk animation
+            setPose(walk, false, false); // no loop
+            animation[walk].stillImage(); // force frame 0
+        }
 
     }
-        public void takeDamage () {
-            hurting = true;
-            hurtDelay = 20;
-        }
+
+    public void takeDamage() {
+        hurting = true;
+        hurtDelay = 40;
     }
-
-
+}
