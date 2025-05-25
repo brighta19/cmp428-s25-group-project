@@ -2,6 +2,7 @@ import javax.swing.*;
 import java.applet.Applet;
 import java.awt.*;
 import java.awt.event.*;
+import java.awt.Button;
 
 public class KnightsTaleEntrance extends Applet implements ActionListener {
     private Image background;
