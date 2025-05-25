@@ -1,15 +1,19 @@
 public class SkullWolf extends Enemy {
 
-    static String [] pose = new String[]{"attack", "death", "hurt", "walk"};
+    static final String [] pose = new String[]{"attack", "death", "hurt", "walk"};
 
-    static int [] count = { 5, 7, 4, 6};
+    static final int [] count = { 5, 7, 4, 6};
 
-    final int attack = 0;
-    final int death  = 1;
-    final int hurt   = 2;
-    final int walk   = 3;
-    private boolean hurting = false;
-    private int hurtDelay = 20;
+    static final int attack = 0;
+    static final int death  = 1;
+    static final int hurt   = 2;
+    static  final int walk   = 3;
+
+    private int idleTimer = 0;
+    private static final int IDLE_DURATION = 180;
+    private static final double CHASE_RANGE = 230;
+
+    private final Player player;
 
     public SkullWolf(double x, double y) {
         super("swolf", x, y, 80, 80, pose, count, 5);
