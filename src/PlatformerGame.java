@@ -2,8 +2,8 @@ import java.awt.*;
 import java.util.ArrayList;
 
 public class PlatformerGame extends GameBase {
-    static int PLAYER_POSITION_X = 500;
-    static int PLAYER_POSITION_Y = 200;
+    static int PLAYER_SPAWN_X = 500;
+    static int PLAYER_SPAWN_Y = 200;
     final double GRAVITY = 1.1;
     boolean isGameWon = false;
 
@@ -12,7 +12,7 @@ public class PlatformerGame extends GameBase {
     Button restartButton;
     Button exitButton;
 
-    static Player player = new Player(PLAYER_POSITION_X, PLAYER_POSITION_Y);
+    static Player player = new Player(PLAYER_SPAWN_X, PLAYER_SPAWN_Y);
     ArrayList<Enemy> enemies = new ArrayList<>(); // to add multiple enemies
 
     TileMap map;
@@ -151,7 +151,9 @@ public class PlatformerGame extends GameBase {
     }
 
     public void paint(Graphics pen) {
-        Camera.moveBy((int)(player.x - player.old_x), 0);
+        if (player.x > PLAYER_SPAWN_X && player.x < TileMap.maps[TileMap.current].getRightLimit() - (WIDTH - PLAYER_SPAWN_X))
+            Camera.moveBy((int)(player.x - player.old_x), 0);
+
 
         TileMap.maps[TileMap.current].draw(pen);
         player.draw(pen);
@@ -210,8 +212,8 @@ public class PlatformerGame extends GameBase {
     }
 
     public void teleportPlayerToStart() {
-        player.x = player.old_x = PLAYER_POSITION_X;
-        player.y = player.old_y = PLAYER_POSITION_Y;
+        player.x = player.old_x = PLAYER_SPAWN_X;
+        player.y = player.old_y = PLAYER_SPAWN_Y;
     }
 
     public void respawnEnemies() {
