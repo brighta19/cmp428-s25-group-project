@@ -1,5 +1,6 @@
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.Random;
 
 public class PlatformerGame extends GameBase {
     static int PLAYER_SPAWN_X = 500;
@@ -24,22 +25,12 @@ public class PlatformerGame extends GameBase {
     public void initialize() {
         player.setAcceleration(GRAVITY);
 
-        Hound dog = new Hound(1200, 200, player);
-        Rogue rog = new Rogue(1500, 200, player);
-        Reaper reaper = new Reaper(2000,200 ,player);
-
-        enemies.add(reaper);
-        enemies.add(dog);
-        enemies.add(rog);
-
-        for (Enemy e : enemies) {
-            e.setAcceleration(GRAVITY);
-        }
-
         map = new TileMap("map1.txt" , 64);
         map = new TileMap("map2.txt" , 64);
         map = new TileMap("map3.txt" , 64);
         level = TileMap.current + 1;
+
+        spawnEnemies();
 
         int centerX = WIDTH / 2 - 100;
         restartButton = new Button(centerX, HEIGHT / 2 - 50, 200, 50, "Restart");
@@ -199,7 +190,7 @@ public class PlatformerGame extends GameBase {
         level = 1;
         TileMap.current = 0;
         Camera.reset();
-        respawnEnemies();
+        spawnEnemies();
     }
 
 
@@ -217,18 +208,32 @@ public class PlatformerGame extends GameBase {
         player.y = player.old_y = PLAYER_SPAWN_Y;
     }
 
-    public void respawnEnemies() {
+    public void spawnEnemies() {
         enemies.clear();
-        Hound dog = new Hound(1200, 100, player);
-        Rogue rog = new Rogue(1500, 100, player);
-        Reaper reaper = new Reaper(1000,200 ,player);
 
-        enemies.add(reaper);
-        enemies.add(dog);
-        enemies.add(rog);
+        Random r = new Random();
 
-        for (Enemy e : enemies) {
+        int spawnRange = TileMap.maps[TileMap.current].getRightLimit() - (PLAYER_SPAWN_X+400);
+        int distance = 500;
+        int numOfEnemies = spawnRange / distance;
+
+        for (int i = 0; i < numOfEnemies; i++) {
+            int n = r.nextInt(3);
+
+            Enemy e;
+            switch (n) {
+                case 0:
+                    e = new Reaper((PLAYER_SPAWN_X+400) + i * distance, 100, player);
+                    break;
+                case 1:
+                    e = new Rogue((PLAYER_SPAWN_X+400) + i * distance, 100, player);
+                    break;
+                default:
+                    e = new Hound((PLAYER_SPAWN_X+400) + i * distance, 100, player);
+            }
+
             e.setAcceleration(GRAVITY);
+            enemies.add(e);
         }
     }
 }

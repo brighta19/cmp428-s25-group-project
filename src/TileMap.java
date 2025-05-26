@@ -181,7 +181,7 @@ public class TileMap extends RoomBase
 			game.level = current + 1;
 
 			game.teleportPlayerToStart();
-			game.respawnEnemies();
+			game.spawnEnemies();
 			Camera.reset();
 		}
 	}
