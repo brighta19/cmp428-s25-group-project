@@ -38,6 +38,7 @@ public class PlatformerGame extends GameBase {
 
         map = new TileMap("map1.txt" , 64);
        map = new TileMap("map2.txt" , 64);
+       map = new TileMap("map3.txt" , 64);
         level = TileMap.current + 1;
 
         int centerX = WIDTH / 2 - 100;

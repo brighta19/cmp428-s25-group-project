@@ -6,7 +6,7 @@ public class TileMap extends RoomBase
 	//tracks which map player is in and the map
 	static int current = 0;
 	static int numMaps = 0;
-	static TileMap[] maps = new TileMap[2];
+	static TileMap[] maps = new TileMap[3];
 	
 	//for periods and characters you seen in the file
 	String[] map;
@@ -76,7 +76,10 @@ public class TileMap extends RoomBase
 		   {
 			   tile_name[i] = input.readLine();
 		   }
-		   
+
+		   lx_limit = 0;
+		   rx_limit = map[0].length() * scale;
+
 		   // how many times the background needs to be repeated
 		   repeatBackground = Integer.parseInt(input.readLine());
 		   
@@ -102,13 +105,7 @@ public class TileMap extends RoomBase
 			   //to skip the gap, makes the text file more readable
 			   input.readLine();
 		   }
-		   
-		   
-		   //the points in which player and camera can't go further
-		   lx_limit = (Integer.parseInt(input.readLine())) * scale;
-		   rx_limit = (Integer.parseInt(input.readLine())) * scale;
-		   
-	
+
 		   input.close();
 		}
 		catch(IOException x) {};	
@@ -210,7 +207,7 @@ public class TileMap extends RoomBase
 				if(c != '.')
 				{	
 					//to check if the bounds are correct
-					for(Rect rect: bounds) { rect.draw(pen); }
+//					for(Rect rect: bounds) { rect.draw(pen); }
 					
 					pen.drawImage(tile[c - 'A'], scale*col - Camera.x, scale*row - Camera.y, scale, scale, null);
 				}

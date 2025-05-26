@@ -56,7 +56,3 @@ tileset/ocean.png
 11
 42
 1
-
-0
-81
-13
