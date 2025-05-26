@@ -5,6 +5,7 @@ public class PlatformerGame extends GameBase {
     static int PLAYER_POSITION_X = 500;
     static int PLAYER_POSITION_Y = 200;
     final double GRAVITY = 1.1;
+    boolean isGameWon = false;
 
     int level = 1;
     boolean isGameOver = false;
@@ -142,6 +143,11 @@ public class PlatformerGame extends GameBase {
         }
 
         map.checkIfNearEdge(player);
+        if (TileMap.current == 2 && player.x > map.getRightLimit() - 50) {
+            isGameWon = true;
+            isGameOver = true; // Optional: freeze game logic
+        }
+
     }
 
     public void paint(Graphics pen) {
@@ -165,16 +171,22 @@ public class PlatformerGame extends GameBase {
         pen.drawString("Level " + level, WIDTH - 200, 50);
 
         if (isGameOver) {
-            pen.setColor(new Color(0, 0, 0, 180)); // transparent overlay
+            pen.setColor(new Color(0, 0, 0, 180));
             pen.fillRect(0, 0, WIDTH, HEIGHT);
 
             pen.setColor(Color.WHITE);
             pen.setFont(new Font("Arial", Font.BOLD, 48));
-            pen.drawString("Game Over", WIDTH / 2 - 150, 300);
 
-            restartButton.draw(pen);  // ✅ pen is available here
-            exitButton.draw(pen);     // ✅ pen is available here
+            if (isGameWon) {
+                pen.drawString("YOU WON!", WIDTH / 2 - 140, 300);
+            } else {
+                pen.drawString("Game Over", WIDTH / 2 - 150, 300);
+            }
+
+            restartButton.draw(pen);
+            exitButton.draw(pen);
         }
+
 
     }
     public void resetGame() {
