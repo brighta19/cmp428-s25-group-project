@@ -55,4 +55,8 @@ public class Camera
 		x += dx;
 		y += dy;
 	}
+
+	public static void reset() {
+		x = 0;
+	}
 }

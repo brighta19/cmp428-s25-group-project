@@ -2,6 +2,7 @@ import java.awt.*;
 import java.util.ArrayList;
 
 public class PlatformerGame extends GameBase {
+    static int PLAYER_POSITION_X = 500;
     final double GRAVITY = 1.1;
 
     int level = 1;
@@ -9,7 +10,7 @@ public class PlatformerGame extends GameBase {
     Button restartButton;
     Button exitButton;
 
-    static Player player = new Player(500, 200);
+    static Player player = new Player(PLAYER_POSITION_X, 200);
     static Player enemy = new Player(1000, 200); // replace with actual enemies
 
     ArrayList<Enemy> enemies = new ArrayList<>(); // to add multiple enemies
@@ -238,6 +239,10 @@ public class PlatformerGame extends GameBase {
         pen.fillRect(20, 20, (int) width, 40);
         pen.setColor(Color.RED);
         pen.fillRect(20, 20, (int) (player.getHealthPercentage() * width), 40);
+    }
+
+    public void teleportPlayerToStart() {
+        player.x = player.old_x = PLAYER_POSITION_X;
     }
 
     public void respawnEnemies() {

@@ -163,6 +163,8 @@ public class TileMap extends RoomBase
 	}*/
 
 	public void checkIfNearEdge(Player player) {
+		PlatformerGame game = (PlatformerGame) GameBase.instance;
+
 		if (player.x < (maps[current].getLeftLimit() - 10) && current > 0) {
 			current--;
 			player.x = maps[current].getRightLimit() - 20;
@@ -174,13 +176,13 @@ public class TileMap extends RoomBase
 
 		if (player.x > (maps[current].getRightLimit() - 10) && current < maps.length - 1) {
 			current++;
-			player.x = maps[current].getLeftLimit();
-			player.old_x = maps[current].getLeftLimit();
-			Camera.x = maps[current].getLeftLimit();
 
-			PlatformerGame game = (PlatformerGame) GameBase.instance;
+
 			game.level = current + 1;
+
+			game.teleportPlayerToStart();
 			game.respawnEnemies();
+			Camera.reset();
 		}
 	}
 
