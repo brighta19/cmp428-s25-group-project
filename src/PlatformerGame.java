@@ -194,13 +194,14 @@ public class PlatformerGame extends GameBase {
     public void resetGame() {
         player.revive();
         teleportPlayerToStart();
-
         isGameOver = false;
+        isGameWon = false;
         level = 1;
         TileMap.current = 0;
         Camera.reset();
         respawnEnemies();
     }
+
 
 
     public void drawPlayerHealthBar(Graphics pen) {
