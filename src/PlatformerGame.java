@@ -3,6 +3,7 @@ import java.util.ArrayList;
 
 public class PlatformerGame extends GameBase {
     static int PLAYER_POSITION_X = 500;
+    static int PLAYER_POSITION_Y = 200;
     final double GRAVITY = 1.1;
 
     int level = 1;
@@ -10,9 +11,7 @@ public class PlatformerGame extends GameBase {
     Button restartButton;
     Button exitButton;
 
-    static Player player = new Player(PLAYER_POSITION_X, 200);
-    static Player enemy = new Player(1000, 200); // replace with actual enemies
-
+    static Player player = new Player(PLAYER_POSITION_X, PLAYER_POSITION_Y);
     ArrayList<Enemy> enemies = new ArrayList<>(); // to add multiple enemies
 
     TileMap map;
@@ -23,7 +22,6 @@ public class PlatformerGame extends GameBase {
 
     public void initialize() {
         player.setAcceleration(GRAVITY);
-        enemy.setAcceleration(GRAVITY);
 
         Hound dog = new Hound(1200, 200, player);
         Rogue rog = new Rogue(1500, 200, player);
@@ -38,22 +36,19 @@ public class PlatformerGame extends GameBase {
         }
 
         map = new TileMap("map1.txt" , 64);
-       map = new TileMap("map2.txt" , 64);
-       map = new TileMap("map3.txt" , 64);
+        map = new TileMap("map2.txt" , 64);
+        map = new TileMap("map3.txt" , 64);
         level = TileMap.current + 1;
 
         int centerX = WIDTH / 2 - 100;
         restartButton = new Button(centerX, HEIGHT / 2 - 50, 200, 50, "Restart");
         exitButton = new Button(centerX, HEIGHT / 2 + 20, 200, 50, "Exit");
-
-
     }
 
     public void inGameLoop() {
         if (isGameOver) return; // ⛔ Stop updating logic if game is over
 
         player.beforeInput();
-        enemy.beforeInput();
 
         if (player.dying || player.y > 1080) {
             isGameOver = true;
@@ -80,20 +75,12 @@ public class PlatformerGame extends GameBase {
         if (player.canShootSpell() && pressing[_I]) {
             player.shootSpell();
         }
-//        if (pressing[_I]) player.injureBy(new Rect(0,0,0,0), 1);
-//        if (pressing[_O]) player.die();
-//        if (pressing[_P]) player.revive();
 
         player.updatePosition();
-        enemy.updatePosition();
-
-//        for (Enemy e: enemies){
-//            e.update();
-//        }
 
         for (int i = 0; i < Spell.spells.size(); i++) {
             Spell s = Spell.spells.get(i);
-            s.beforeMove();;
+            s.beforeMove();
 
             if (s.done) {
                 Spell.spells.remove(s);
@@ -113,19 +100,7 @@ public class PlatformerGame extends GameBase {
             }
         }
 
-        if (player.hits(enemy)) {
-            player.registerHit(enemy);
-
-            int dmg = player.in_air ? 3 : 1;
-            enemy.injureBy(player, dmg);
-        }
-//        if (enemy hits player) { player.injureBy(enemy, 1); ... }
-
         player.in_air = true;
-//        if (player.y + player.h > 1000) {
-//            player.y = 1000 - player.h;
-//            player.ground();
-//        }
 
         for (Enemy e : enemies) {
             if (player.hits(e)) {
@@ -142,13 +117,6 @@ public class PlatformerGame extends GameBase {
                     double dy = (player.y + player.h) - bounds[i].y;
                     player.pushBy(0, -dy);
                     player.ground();
-                }
-            }
-            if(enemy.overlaps(bounds[i])) {
-                if(enemy.cameFromAbove()) {
-                    double dy = (enemy.y + enemy.h) - bounds[i].y;
-                    enemy.pushBy(0, -dy);
-                    enemy.ground();
                 }
             }
             for (Enemy e : enemies) {
@@ -181,30 +149,20 @@ public class PlatformerGame extends GameBase {
 
         TileMap.maps[TileMap.current].draw(pen);
         player.draw(pen);
-        player.drawBoxes(pen);
-        enemy.draw(pen);
 
         // draw multiple enemies
         for (Enemy e : enemies) {
             e.draw(pen);
-            e.drawBoxes(pen);
         }
 
         for (int i = 0; i < Spell.spells.size(); i++) {
             Spell.spells.get(i).draw(pen);
-//            Spell.spells.get(i).drawBoxes(pen);
         }
 
         drawPlayerHealthBar(pen);
         pen.setColor(Color.YELLOW);//lol
         pen.setFont(new Font("Arial", Font.BOLD, 36));
         pen.drawString("Level " + level, WIDTH - 200, 50);
-
-        //TileMap.maps[TileMap.current].draw(pen);
-        //Rect[] bounds = TileMap.maps[TileMap.current].getBounds();
-        //for (Rect bound : bounds) {
-        //pen.drawRect((int)bound.x, (int)bound.y, bound.w, bound.h);
-        //}
 
         if (isGameOver) {
             pen.setColor(new Color(0, 0, 0, 180)); // transparent overlay
@@ -221,14 +179,12 @@ public class PlatformerGame extends GameBase {
     }
     public void resetGame() {
         player.revive();
-        player.x = 500;
-        player.y = 200;
-        player.old_x = 500;
+        teleportPlayerToStart();
 
         isGameOver = false;
         level = 1;
         TileMap.current = 0;
-        Camera.setLocation(0, 0);
+        Camera.reset();
         respawnEnemies();
     }
 
@@ -243,6 +199,7 @@ public class PlatformerGame extends GameBase {
 
     public void teleportPlayerToStart() {
         player.x = player.old_x = PLAYER_POSITION_X;
+        player.y = player.old_y = PLAYER_POSITION_Y;
     }
 
     public void respawnEnemies() {

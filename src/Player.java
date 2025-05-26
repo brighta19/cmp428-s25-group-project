@@ -264,6 +264,7 @@ public class Player extends Sprite {
     public void revive() {
         dying = false;
         health = INITIAL_HEALTH;
+        direction = 1;
     }
 
     public void beforeInput() {

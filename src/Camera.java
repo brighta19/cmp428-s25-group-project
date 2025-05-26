@@ -58,5 +58,6 @@ public class Camera
 
 	public static void reset() {
 		x = 0;
+		y = 0;
 	}
 }
