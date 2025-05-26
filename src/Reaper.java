@@ -28,6 +28,24 @@ public class Reaper extends Enemy {
     }
 
     @Override
+    public void moveLeft() {
+        vx = -SPEED;
+        direction = 1; // face right (for right-facing sprite)
+    }
+
+    @Override
+    public void moveRight() {
+        vx = SPEED;
+        direction = -1; // face left
+    }
+
+    public Rect getHitbox() {
+        double hitboxX = x + (direction > 0 ? -hitboxWidth : hitboxWidth);
+        double hitboxY = y + hitboxOffsetY;
+        return new Rect(hitboxX, hitboxY, hitboxWidth, hitboxHeight);
+    }
+
+    @Override
     public void update() {
         boolean chasing = false;
 
@@ -64,10 +82,8 @@ public class Reaper extends Enemy {
                     } double dx = player.x - this.x;
                     if (dx > 3) {
                         moveRight();
-                        direction = 1;
                     } else if (dx < -3) {
                         moveLeft();
-                        direction = -1;
                     } else {
                         vx = 0;
                     }
